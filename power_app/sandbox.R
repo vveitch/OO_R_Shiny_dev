@@ -4,9 +4,9 @@
 rm(list = ls())
 
 ###user inputs
-sample_size=1000;
+sample_size=100;
 num_trials=100;
-p=0.51;
+p=0.6;
 hA=">0.5";
 sig_level=0.05;
 
