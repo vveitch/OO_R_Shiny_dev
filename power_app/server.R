@@ -1,29 +1,17 @@
 # server.R
 
-source("helpers.R")
-counties <- readRDS("data/counties.rds")
-library(maps)
-library(mapproj)
+source("power_logic.R")
 
-shinyServer(
+shinyServer(function(input, output) {
   
-  function(input, output) {
-    
-    output$map <- renderPlot({
-      data <- switch(input$var, 
-                     "Percent White" = counties$white,
-                     "Percent Black" = counties$black,
-                     "Percent Hispanic" = counties$hispanic,
-                     "Percent Asian" = counties$asian)
-      
-      color <- switch(input$var, 
-                      "Percent White" = "darkgreen",
-                      "Percent Black" = "black",
-                      "Percent Hispanic" = "darkorange",
-                      "Percent Asian" = "darkviolet")
-      
-      percent_map(var = data, color = color, legend.title = input$var, max = input$range[2], min = input$range[1])
-    })    
+  #notes: make the data re-simulation reactive 
+  
+    output$theoryPowerOutput <- renderText({paste("Theoretical power: ", 
+                                                  theory_power(input$hA,
+                                                               input$sig_level,
+                                                               input$sample_size,
+                                                               input$effect_size))})  
     
   }
-)
+)    
+

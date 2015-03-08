@@ -1,5 +1,5 @@
 #sandbox for power app
-
+library(vcd)
 
 rm(list = ls())
 
@@ -39,4 +39,4 @@ est_power <- num_rejects/num_trials
 hist(simulate_data,breaks=20)
 hist(pval,breaks=(0:ceiling(1/sig_level)/ceiling(1/sig_level)))
 
-mosaic(as.matrix(c(num_rejects,num_trials-num_rejects)))
+#mosaic(as.matrix(c(num_rejects,num_trials-num_rejects)))
