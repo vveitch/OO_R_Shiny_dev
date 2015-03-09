@@ -9,7 +9,7 @@ shinyUI(fluidPage(
       
       numericInput("sample_size", label = h3("Sample size"), value = 100, min=0, max=1000),
       
-      numericInput("num_trials", label = h3("Number of trials"), value = 1, min=0, max=1000),
+      numericInput("num_trials", label = h3("Number of repeated experiments"), value = 100, min=0, max=1000),
       
       sliderInput("effect_size", label = h3("True probability p"), min = 0, 
                   max = 1, value = 0.6),
@@ -27,7 +27,11 @@ shinyUI(fluidPage(
     ),
     
     mainPanel(
-      textOutput("theoryPowerOutput")
-    )
+      textOutput("theoryPower"),
+      textOutput("estPower"),
+      plotOutput("dataHist"),
+      plotOutput("pValHist")
+      
+      )
   )
 ))
