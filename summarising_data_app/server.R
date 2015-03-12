@@ -24,6 +24,8 @@ shinyServer(function(input, output) {
              histogram(as.formula(paste("~ ",input$mainVar,"|", input$sepVar)),
                                   data=data, main = paste(input$mainVar," blocked by ",input$sepVar)) 
            },
+           "pie" = pie(table(data[input$mainCatVar])),
+           "bar" = barplot(table(data[input$mainCatVar])),
     )
   })
 })  
