@@ -15,6 +15,9 @@ boxplot(SkeletonDatacomplete$Age)
 #have a "group by" option
 boxplot(SkeletonDatacomplete$Age~SkeletonDatacomplete$Sex,main="Age vs Sex")
 boxplot(SkeletonDatacomplete$Age~SkeletonDatacomplete$BMIcat,main="BMI vs Sex")
+#ggplot2 version:
+
+
 
 #histograms
 #same basic thing
@@ -24,7 +27,8 @@ sexCount <- table(SkeletonDatacomplete$Sex)
 bmiCount <- table(SkeletonDatacomplete$BMIcat)
 
 #dotplot
-dotPlot(sexCount)
+tmpPlot<-ggplot(SkeletonDatacomplete, aes_string("BMIquant"), main="some title") + geom_dotplot(binwidth=0.5, method='histodot')+ylim(0,40)    
+tmpPlot+facet_grid(paste(".~","Sex"))
 
 #pie charts
 pie(sexCount)

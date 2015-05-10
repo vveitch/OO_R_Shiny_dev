@@ -10,23 +10,49 @@ data<-SkeletonDatacomplete
 
 shinyServer(function(input, output) {
   
+  #this is a workaround to needing to get the variable name different depending on 
+  #whether we're dealing with quant or cat var (because of how shiny works)
+  mainVarName <- function(){
+    if (input$plotType== "pie" || input$plotType == "bar"){
+      input$mainCatVar
+    } else {
+      input$mainVar
+    }
+  }
+  
   output$dataPlot <- renderPlot({
     switch(input$plotType,
            "box"= if (input$sepVar=="none"){
-             boxplot(data[[input$mainVar]],main=input$mainVar)  
+             boxplot(data[[mainVarName()]],main=mainVarName())  
            } else {
-             boxplot(data[[input$mainVar]]~data[[input$sepVar]], main = paste(input$mainVar," blocked by ",input$sepVar)) 
+             boxplot(data[[mainVarName()]]~data[[input$sepVar]], main = paste(mainVarName()," blocked by ",input$sepVar)) 
            },
            "hist" = if (input$sepVar=="none"){
-             histogram(data[[input$mainVar]],main=input$mainVar)  
+             histogram(data[[mainVarName()]],main=mainVarName())  
            } else {
              #inputs need to be text so we're obliged to enter the formula in this wacky way
-             histogram(as.formula(paste("~ ",input$mainVar,"|", input$sepVar)),
-                                  data=data, main = paste(input$mainVar," blocked by ",input$sepVar)) 
+             histogram(as.formula(paste("~ ",mainVarName(),"|", input$sepVar)),
+                       data=data, main = paste(mainVarName()," blocked by ",input$sepVar)) 
            },
-           "pie" = pie(table(data[input$mainCatVar])),
-           "bar" = barplot(table(data[input$mainCatVar])),
+           #TODO: dotsize scaling set to work with largest size on my laptop. This is is stupid; surely there's a better way to do this
+           "dot" = if (input$sepVar=="none"){
+             ggplot(data, aes_string(mainVarName()), main=mainVarName()) + 
+               geom_dotplot(binwidth=1, method='dotdensity',dotsize=10/max(table(round(SkeletonDatacomplete[[mainVarName()]]))))+
+              scale_y_continuous(name = "", breaks = NULL)
+           }else{
+             ggplot(data, aes_string(mainVarName(),fill=input$sepVar), main=paste(mainVarName()," blocked by ",input$sepVar)) + 
+               geom_dotplot(stackgroups=TRUE,binwidth=1, method='dotdensity',dotsize=10/max(table(round(SkeletonDatacomplete[[mainVarName()]])))) +  scale_y_continuous(name = "", breaks = NULL)
+           },
+           
+           "pie" = pie(table(data[mainVarName()])),
+           "bar" = barplot(table(data[mainVarName()])),
     )
   })
+  
+  # Generate a summary of the data
+  output$summary <- renderPrint({
+    summary(data[[mainVarName()]])
+  })
 })  
+
 
