@@ -1,6 +1,7 @@
 # server.R
 
-library(ggplot2)
+library(BHH2) #dotPlot
+library(lattice) #histogram
 
 ##See http://shiny.rstudio.com/articles/dynamic-ui.html for advice on dynamic UI
 
@@ -27,9 +28,9 @@ shinyServer(function(input, output) {
              boxplot(data[[mainVarName()]]~data[[input$sepVar]], main = paste(mainVarName()," blocked by ",input$sepVar)) 
            },
            "hist" = if (input$sepVar=="none"){
-             histogram(data[[mainVarName()]],main=mainVarName(),xlab=paste(mainVarName(),"Value"))  
+             histogram(data[[mainVarName()]],main=mainVarName())  
            } else {
-             #inputs need to be text so we're obliged to enter the formula in this whacky way
+             #inputs need to be text so we're obliged to enter the formula in this wacky way
              histogram(as.formula(paste("~ ",mainVarName(),"|", input$sepVar)),
                        data=data, main = paste(mainVarName()," blocked by ",input$sepVar)) 
            },
@@ -37,7 +38,7 @@ shinyServer(function(input, output) {
            "dot" = if (input$sepVar=="none"){
              ggplot(data, aes_string(mainVarName()), main=mainVarName()) + 
                geom_dotplot(binwidth=1, method='dotdensity',dotsize=10/max(table(round(SkeletonDatacomplete[[mainVarName()]]))))+
-               scale_y_continuous(name = "", breaks = NULL)
+              scale_y_continuous(name = "", breaks = NULL)
            }else{
              ggplot(data, aes_string(mainVarName(),fill=input$sepVar), main=paste(mainVarName()," blocked by ",input$sepVar)) + 
                geom_dotplot(stackgroups=TRUE,binwidth=1, method='dotdensity',dotsize=10/max(table(round(SkeletonDatacomplete[[mainVarName()]])))) +  scale_y_continuous(name = "", breaks = NULL)
@@ -48,38 +49,9 @@ shinyServer(function(input, output) {
     )
   })
   
-  #extends summary to give mean and s.d. when applied to a numeric input and relative frequencies when applied to categorical input
-  data_summary <- function(input_vec){
-    if (is.numeric(input_vec)) {
-      mean_stuff <- c(mean(input_vec),sd(input_vec));
-      names(mean_stuff)<-c("Mean","s.d.");
-      as.table(c(summary(input_vec),mean_stuff))
-    } else {
-      tabby <- rbind(table(input_vec),
-                     table(input_vec)/sum(table(input_vec)));
-      rownames(tabby)<-c("Counts","Rel. Freqs.");
-      tabby
-    }
-  }
-  
   # Generate a summary of the data
   output$summary <- renderPrint({
-    if (input$sepVar=="none"){
-      data_summary(data[[mainVarName()]])  
-    } 
-    #this gives a summary for each level of the selected grouping factor. Awkward coding for rshiny reasons
-    else if (is.numeric(data[[mainVarName()]])) {
-      summary_list<-tapply(data[[mainVarName()]],data[[input$sepVar]],data_summary);
-      acc=summary_list[[1]]
-      for (i in 2:length(summary_list)){
-        acc<-rbind(acc,summary_list[[i]]);
-      }
-      rownames(acc)<-names(summary_list);
-      acc
-      
-    }
-    
-        
+    summary(data[[mainVarName()]])
   })
 })  
 

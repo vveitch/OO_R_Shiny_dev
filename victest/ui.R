@@ -25,7 +25,7 @@ shinyUI(fluidPage(
         selectInput("mainVar", "Variable of interest",
                     quantNames),
         
-        selectInput("sepVar", "Subgroup",
+        selectInput("sepVar", "Block by",
                     c("none", catNames))
       ),
       
