@@ -1,6 +1,7 @@
 # server.R
 
 library(ggplot2)
+library(lattice)
 
 ##See http://shiny.rstudio.com/articles/dynamic-ui.html for advice on dynamic UI
 
