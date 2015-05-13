@@ -65,7 +65,7 @@ shinyServer(function(input, output) {
   
   # Generate a summary of the data
   output$summary <- renderPrint({
-    if (input$sepVar=="none" || !(is.numeric(data[[mainVarName()]]))){
+    if (input$sepVar=="none"){
       data_summary(data[[mainVarName()]])  
     } 
     #this gives a summary for each level of the selected grouping factor. Awkward coding for rshiny reasons
