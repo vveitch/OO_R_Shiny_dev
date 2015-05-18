@@ -1,0 +1,140 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Module 1 Exercise
+\end_layout
+
+\begin_layout Standard
+Recall that the skeleton data was collected in order to assess the accuracy
+ of methods used by anthropologists to estimate age at death.
+ The Visualizing Skeleton Data RShiny app lets us quickly inspect the data
+ by producing a number of helpful visualizations.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Real world data often comes with mistakes or mislabellings.
+ The skeleton data includes BMI as both a quantitative variable and as a
+ categorical variable.
+ Try several different ways of plotting the quantitative BMIquant blocked
+ by the subgroup BMIcat.
+ Do you notice anything unusual?
+\end_layout
+
+\begin_layout Enumerate
+If our data was overwhelmingly from males or overwhelmingly from obese people
+ we might miss seeing effects due to these factors.
+ Try plotting the categorical variables in two different ways.
+ Does it seem like any group is strongly overrepresented or underrepresented?
+ 
+\end_layout
+
+\begin_layout Enumerate
+Pie charts are popular amongst elementary school students but not amongst
+ statisticians.
+ Try producing pie charts of Sex and BMIcat and eyeballing the relative
+ frequencies of each category visually.
+ The true relative frequencies are shown in the Data Summary under the chart.
+ Were your estimates accurate?
+\end_layout
+
+\begin_layout Enumerate
+Data that comes with several covariates might lead us to conflate the source
+ of different effects.
+ For example, if almost all of the obese people in the dataset were very
+ old then we might misattribute to age inaccurate predictions due to obesity.
+ Use the plots to explore whether this phenomena is present in our data
+ set.
+ Are there comparisons you would like to make that are not possible with
+ the plotting done in the app?
+\end_layout
+
+\begin_layout Enumerate
+What is the average BMI for females in this data set? What is the average
+ BMI for males?
+\end_layout
+
+\begin_layout Enumerate
+For each of the estimation strategies (Di Gangi et al.
+ and Suchey-Brooks) decide whether the method tends to overestimate or underesti
+mate age of death.
+ The errors in estimation are given as DGerror and SBerror respectively.
+ What plots are most useful for assessing this? If you were an anthropologist
+ how might you incorporate this information?
+\end_layout
+
+\begin_layout Enumerate
+For each of the estimation strategies, does body mass or sex substantially
+ impact the accuracy of the estimate? How about the variability of the estimate?
+ What kind of plots are useful for assessing this?
+\end_layout
+
+\begin_layout Enumerate
+In practical terms an anthropologist would just like to know which of these
+ methods they should use.
+ What further exploratory analysis would you like to do before making a
+ preliminary recommendation? Are there any visualizations or plots that
+ you think should be produced?
+\end_layout
+
+\end_body
+\end_document
