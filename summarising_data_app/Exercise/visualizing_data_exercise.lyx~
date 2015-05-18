@@ -2,8 +2,13 @@
 \lyxformat 413
 \begin_document
 \begin_header
-\textclass article
+\textclass amsart
 \use_default_options true
+\begin_modules
+theorems-ams
+eqs-within-sections
+figs-within-sections
+\end_modules
 \maintain_unincluded_children false
 \language english
 \language_package default
@@ -25,6 +30,7 @@
 \bibtex_command default
 \index_command default
 \paperfontsize default
+\spacing single
 \use_hyperref false
 \papersize default
 \use_geometry false
@@ -68,7 +74,8 @@ Recall that the skeleton data was collected in order to assess the accuracy
  of methods used by anthropologists to estimate age at death.
  The Visualizing Skeleton Data RShiny app lets us quickly inspect the data
  by producing a number of helpful visualizations.
- 
+ In this exercise we will do the first stages of an exploratory analysis
+ of this data.
 \end_layout
 
 \begin_layout Enumerate
@@ -109,12 +116,17 @@ Data that comes with several covariates might lead us to conflate the source
 \end_layout
 
 \begin_layout Enumerate
+What is the average BMI for females in this data set? What is the average
+ BMI for males?
+\end_layout
+
+\begin_layout Enumerate
 For each of the estimation strategies (Di Gangi et al.
  and Suchey-Brooks) decide whether the method tends to overestimate or underesti
 mate age of death.
  The errors in estimation are given as DGerror and SBerror respectively.
  What plots are most useful for assessing this? If you were an anthropologist
- how might you incorporate this information?
+ how might you make use of this information?
 \end_layout
 
 \begin_layout Enumerate

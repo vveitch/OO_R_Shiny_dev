@@ -1,0 +1,63 @@
+%% LyX 2.0.6 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[oneside,english]{amsart}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{amsthm}
+
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
+\numberwithin{equation}{section}
+\numberwithin{figure}{section}
+
+\makeatother
+
+\usepackage{babel}
+\begin{document}
+
+\title{Module 1 Exercise}
+
+\maketitle
+Recall that the skeleton data was collected in order to assess the
+accuracy of methods used by anthropologists to estimate age at death.
+The Visualizing Skeleton Data RShiny app lets us quickly inspect the
+data by producing a number of helpful visualizations. In this exercise
+we will do the first stages of an exploratory analysis of this data.
+\begin{enumerate}
+\item Real world data often comes with mistakes or mislabellings. The skeleton
+data includes BMI as both a quantitative variable and as a categorical
+variable. Try several different ways of plotting the quantitative
+BMIquant blocked by the subgroup BMIcat. Do you notice anything unusual?
+\item If our data was overwhelmingly from males or overwhelmingly from obese
+people we might miss seeing effects due to these factors. Try plotting
+the categorical variables in two different ways. Does it seem like
+any group is strongly overrepresented or underrepresented? 
+\item Pie charts are popular amongst elementary school students but not
+amongst statisticians. Try producing pie charts of Sex and BMIcat
+and eyeballing the relative frequencies of each category visually.
+The true relative frequencies are shown in the Data Summary under
+the chart. Were your estimates accurate?
+\item Data that comes with several covariates might lead us to conflate
+the source of different effects. For example, if almost all of the
+obese people in the dataset were very old then we might misattribute
+to age inaccurate predictions due to obesity. Use the plots to explore
+whether this phenomena is present in our data set. Are there comparisons
+you would like to make that are not possible with the plotting done
+in the app?
+\item What is the average BMI for females in this data set? What is the
+average BMI for males?
+\item For each of the estimation strategies (Di Gangi et al. and Suchey-Brooks)
+decide whether the method tends to overestimate or underestimate age
+of death. The errors in estimation are given as DGerror and SBerror
+respectively. What plots are most useful for assessing this? If you
+were an anthropologist how might you make use of this information?
+\item For each of the estimation strategies, does body mass or sex substantially
+impact the accuracy of the estimate? How about the variability of
+the estimate? What kind of plots are useful for assessing this?
+\item In practical terms an anthropologist would just like to know which
+of these methods they should use. What further exploratory analysis
+would you like to do before making a preliminary recommendation? Are
+there any additional visualizations or plots that you think should
+be produced?\end{enumerate}
+
+\end{document}
