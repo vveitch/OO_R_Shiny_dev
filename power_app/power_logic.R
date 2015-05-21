@@ -3,9 +3,9 @@
 ###03/08/2015
 
 
-#rm(list = ls())
-
-###user inputs for debugging
+# rm(list = ls())
+# 
+# ##user inputs for debugging
 # sample_size=100;
 # num_trials=100;
 # p=0.6;
@@ -13,7 +13,6 @@
 # sig_level=0.05;
 
 ###logic
-#
 
 sim_data <- function(num_trials,sample_size,p){
   rbinom(num_trials,sample_size,as.matrix(rep(p,num_trials)))  
@@ -35,13 +34,22 @@ pval <- function(hA,sample_size,simulate_data){
 #pbinom with lower.tail=F takes >x, but we want >= : this means we need a -1
 #beware: the -1's are in here for totally conceptually different reasons
 #for the two sided test we'll assume a symmetric rejection interval (ie. equal mass in lower and upper tail)
-theory_power <- function(hA,sig_level,sample_size,p){
-  switch(hA, 
-         "two_side"= pbinom(qbinom(sig_level/2,sample_size,0.5, lower.tail=T)-1,sample_size,p,lower.tail=T) + 
-         pbinom(qbinom(sig_level/2,sample_size,0.5, lower.tail=F)-1,sample_size,p,lower.tail=F),
-         "<0.5" = pbinom(qbinom(sig_level,sample_size,0.5, lower.tail=T)-1,sample_size,p,lower.tail=T),
-         ">0.5" = pbinom(qbinom(sig_level,sample_size,0.5, lower.tail=F)-1,sample_size,p,lower.tail=F)
+theory_reject_prob <- function(hA,sig_level,sample_size,p){
+  out <- switch(hA, 
+                "two_side"<- pbinom(qbinom(sig_level/2,sample_size,0.5, lower.tail=T)-1,sample_size,p,lower.tail=T) + 
+                    pbinom(qbinom(sig_level/2,sample_size,0.5, lower.tail=F)-1,sample_size,p,lower.tail=F),
+                "<0.5" = pbinom(qbinom(sig_level,sample_size,0.5, lower.tail=T)-1,sample_size,p,lower.tail=T),
+                ">0.5" = pbinom(qbinom(sig_level,sample_size,0.5, lower.tail=F)-1,sample_size,p,lower.tail=F)
   )
+    round(1000*out)/1000 #3 decimal place display
+}
+
+summary_table <- function(hA,sig_level,sample_size,p,num_trials,sim_data){
+  output <- rbind(theory_reject_prob(hA, sig_level, sample_size,p),
+              sum(pval(hA,sample_size,sim_data)<sig_level)/num_trials);
+  colnames(output) <- "Rejection Probability";
+  rownames(output) <- c("Theoretical", "Estimated");
+  output  
 }
 
 

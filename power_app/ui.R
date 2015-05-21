@@ -27,8 +27,9 @@ shinyUI(fluidPage(
     ),
     
     mainPanel(
-      textOutput("theoryPower"),
-      textOutput("estPower"),
+   #   textOutput("theoryPower"),
+  #    textOutput("estPower"),
+      verbatimTextOutput("summary"),  
       plotOutput("dataHist"),
       plotOutput("pValHist")
       
