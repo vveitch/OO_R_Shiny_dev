@@ -50,7 +50,7 @@ shinyUI(navbarPage("Statistical Tests 2",
                                 
                                 selectInput("hA_two_sample", label = h3("Alternative hypothesis"), 
                                             choices = 
-                                              list("p not equal 0.5" = "two.sided", "p<0.5" = "less", "p>0.5" = "greater"), 
+                                              list("probabilities not equal" = "two.sided", "A less than B" = "less", "A greater than B" = "greater"), 
                                             selected = ">0.5"),
                                 
                                 sliderInput("sig_level_two_sample", 
