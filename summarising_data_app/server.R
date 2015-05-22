@@ -34,15 +34,22 @@ shinyServer(function(input, output) {
              histogram(as.formula(paste("~ ",mainVarName(),"|", input$sepVar)),
                        data=data, main = paste(mainVarName()," blocked by ",input$sepVar)) 
            },
-           #TODO: dotsize scaling set to work with largest size on my laptop. This is is stupid; surely there's a better way to do this
+           #TODO: dotsize scaling
            "dot" = if (input$sepVar=="none"){
-             ggplot(data, aes_string(mainVarName()), main=mainVarName()) + 
-               geom_dotplot(binwidth=1, method='dotdensity',dotsize=10/max(table(round(SkeletonDatacomplete[[mainVarName()]]))))+
+             p<-ggplot(data, aes_string(mainVarName()), main=mainVarName()) + 
+               geom_dotplot(binwidth=1, method='histodot',
+                            dotsize=10/max(table(round(SkeletonDatacomplete[[mainVarName()]]))),
+                            binpositions="all")+
                scale_y_continuous(name = "", breaks = NULL)
+             print(p)
            }else{
-             ggplot(data, aes_string(mainVarName(),fill=input$sepVar), main=paste(mainVarName()," blocked by ",input$sepVar)) + 
-               geom_dotplot(stackgroups=TRUE,binwidth=1, method='dotdensity',dotsize=10/max(table(round(SkeletonDatacomplete[[mainVarName()]])))) +  scale_y_continuous(name = "", breaks = NULL)
-           },
+             p<-ggplot(data, aes_string(mainVarName(),fill=input$sepVar), main=paste(mainVarName()," blocked by ",input$sepVar)) + 
+               geom_dotplot(stackgroups=TRUE,binwidth=1, method='histodot',
+                            dotsize=10/max(table(round(SkeletonDatacomplete[[mainVarName()]]))),
+                            binpositions="all") +
+               scale_y_continuous(name = "", breaks = NULL)
+            print(p)
+             },
            
            "pie" = pie(table(data[mainVarName()])),
            "bar" = barplot(table(data[mainVarName()])),
@@ -52,12 +59,13 @@ shinyServer(function(input, output) {
   #extends summary to give mean and s.d. when applied to a numeric input and relative frequencies when applied to categorical input
   data_summary <- function(input_vec){
     if (is.numeric(input_vec)) {
-      mean_stuff <- c(mean(input_vec),sd(input_vec));
-      names(mean_stuff)<-c("Mean","s.d.");
-      as.table(c(summary(input_vec),mean_stuff))
+      sd_stuff <- round(sd(input_vec)*100)/100;
+      names(sd_stuff)<-"s.d.";
+      as.table(c(summary(input_vec),sd_stuff))
     } else {
-      tabby <- rbind(table(input_vec),
-                     table(input_vec)/sum(table(input_vec)));
+      tabby <- table(input_vec);
+      tabby <- rbind(tabby,
+                     round(1000*table(input_vec)/sum(table(input_vec)))/1000);
       rownames(tabby)<-c("Counts","Rel. Freqs.");
       tabby
     }

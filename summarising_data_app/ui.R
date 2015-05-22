@@ -9,7 +9,7 @@ catNames = list( "Sex","BMIcat")
 quantNames = list("BMIquant" ,  "Age"     ,   "DGestimate", "DGerror"  ,  "SBestimate", "SBerror")
 
 shinyUI(fluidPage(
-  titlePanel("Visualizing Skeleton Data"),
+  titlePanel("Visualizing the Skeleton Data"),
   
   sidebarLayout(
     sidebarPanel(
