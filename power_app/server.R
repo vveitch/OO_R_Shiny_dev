@@ -1,60 +1,80 @@
 # server.R
-
+library(pwr)
+library(ggplot2)
 source("power_logic.R")
+
+nA<-rep(seq(from=2,to=1000,by=10),100)
+nB=vector(mode="integer",length=10000);
+sequence_track <- seq(from=2,to=1000,by=10);
+for (i in 1:100){
+  nB[(100*(i-1)+1):(100*i)]=(sequence_track[i]);
+}
 
 shinyServer(function(input, output, session) {
   
-  ###biased coin sever stuff
-  output$summary <- renderPrint(summary_table(input$hA,
-                                              input$sig_level,
-                                              input$sample_size,
-                                              input$effect_size,
-                                              input$num_trials,
-                                              simulateData()))
+  ###logic for single (s) sample proportion test
+  #this generates the function that relates sample size and power
+  #ie. it's a (reactive) closure 
+  s.samp_pwr <- reactive({
+    function(n) {(pwr.p.test(h=ES.h(input$true_prob,input$null_prob),
+                             n=n,
+                             sig.level=input$sig_level,
+                             power=NULL,
+                             alternative=input$hA))$power}
+  })    
   
-  #I made this reactive as best practice in anticipation of doing other things with it later; 
-  #it doesn't matter if we're just calling plots on this
-  simulateData <- reactive({
-    sim_data(input$num_trials,input$sample_size,input$effect_size)
+  output$summary <- renderPrint(format_output((s.samp_pwr())(input$sample_size)))
+                                      
+  
+  output$s.powerPlot <- renderPlot({
+    ggplot(data.frame(x=c(1, 1000)), aes(x)) + stat_function(fun=s.samp_pwr()) + 
+      coord_cartesian(ylim = c(0, 1)) + 
+      labs(title='Power vs Sample Size',x="Sample Size (n)",y=paste("Power (1-", expression(beta),")")) +
+      theme(plot.title = element_text(size=20, face="bold", vjust=2))
   })
   
-  output$dataHist <- renderPlot({
-    hist(simulateData(),breaks=20, 
-         main="Number of Successes per Experiment",
-         xlab=paste("Number of success in ",input$sample_size," attempts"),
-         right=FALSE)
-  })
+  ###logic for two equal (te) sample proportion test
 
-  output$pValHist <- renderPlot({
-    hist(pval(input$hA,input$sample_size,simulateData()),
-         breaks=(0:40/40), #chosen to look reasonably good and force domain to be 0..1
-         main="Observed p-values",
-         xlab="Observed p-value",
-          right=FALSE)
+  te.samp_pwr <- reactive({
+    function(n) {(pwr.2p.test(h=ES.h(input$te.true_prob_A,input$te.true_prob_B),
+                             n=n,
+                             sig.level=input$te.sig_level,
+                             power=NULL,
+                             alternative=input$te.hA))$power}
+  })    
+  
+  output$te.summary <- renderPrint(format_output((te.samp_pwr())(input$te.sample_size)))
+  
+  
+  output$te.powerPlot <- renderPlot({
+    ggplot(data.frame(x=c(1, 1000)), aes(x)) + stat_function(fun=te.samp_pwr()) + 
+      coord_cartesian(ylim = c(0, 1)) + 
+      labs(title='Power vs Sample Size',x="Sample Size (n)",y=paste("Power (1-", expression(beta),")")) +
+      theme(plot.title = element_text(size=20, face="bold", vjust=2))
   })
   
-  ###two sample server stuff
-  output$summary_two_sample <- renderPrint(summary_table_two_sample(input$hA_two_sample,
-                                              input$sig_level_two_sample,
-                                              input$sample_size_A,input$sample_size_B,
-                                              input$effect_size_A,input$effect_size_B,
-                                              input$num_trials_two_sample,
-                                              simulateData_two_sample()))
-
-  #I made this reactive as best practice in anticipation of doing other things with it later; 
-  #it doesn't matter if we're just calling plots on this
-  simulateData_two_sample <- reactive({
-    sim_data_two_sample(input$num_trials_two_sample,input$sample_size_A,input$sample_size_B,input$effect_size_A,input$effect_size_B)
+  ###logic for two unequal (tu) sample proportion test
+  
+  tu.samp_pwr <- reactive({
+    function(nA,nB) {(pwr.2p2n.test(h=ES.h(input$tu.true_prob_A,input$tu.true_prob_B),
+                              n1=nA, n2=nB,
+                              sig.level=input$tu.sig_level,
+                              power=NULL,
+                              alternative=input$tu.hA))$power}
+  })    
+  
+  output$tu.summary <- renderPrint(format_output((tu.samp_pwr())(input$tu.sample_size_A,input$tu.sample_size_B)))
+  
+  powerdf <- reactive({
+    power<-vapply(1:10000, function(x) (tu.samp_pwr())(nA[x],nB[x]), 1)
+    data.frame(nA,nB,power)
+    })
+  
+  output$tu.powerPlot <- renderPlot({
+    ggplot(powerdf(), aes(nA,nB, z = power))+
+     geom_tile(aes(fill = power)) + stat_contour()
   })
   
-  output$pValHist_two_sample <- renderPlot({
-    hist(pval_two_sample(input$hA_two_sample,input$sample_size_A,input$sample_size_B,simulateData_two_sample()),
-         breaks=(0:40/40), #chosen to look reasonably good and force domain to be 0..1
-         main="Observed p-values",
-         xlab="Observed p-value",
-         right=FALSE)
-  })
-  
-}
+  }
 )    
 

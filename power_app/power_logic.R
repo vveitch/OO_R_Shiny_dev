@@ -2,8 +2,33 @@
 ###Victor Veitch
 ###03/08/2015
 
-
 rm(list = ls())
+
+#summary formatting
+format_output <- function(x){
+  cat(paste("Power: ",format(round(1000*x)/1000)))
+}
+
+
+#plotting one sample
+one_samp_pwr_fn <- function(h,sig.level,alternative){
+  function(n) {(pwr.p.test(h=h,n=n,sig.level=sig.level,power=NULL,alternative=alternative))$power}
+}
+
+# ggplot(data.frame(x=c(1, 1000)), aes(x)) + stat_function(fun=one_samp_pwr) + 
+#   labs(title='Power vs Sample Size',x="Sample Size (n)",y=paste("Power (1-", expression(beta),")")) +
+#   theme(plot.title = element_text(size=20, face="bold", vjust=2))
+
+##used for contour plot with unequal sample sizes
+nA<-rep(seq(from=2,to=1000,by=10),100)
+nB=vector(mode="integer",length=10000);
+sequence_track <- seq(from=2,to=1000,by=10);
+for (i in 1:100){
+  nB[(100*(i-1)+1):(100*i)]=(sequence_track[i]);
+}
+
+
+####OLD LOGIC FROM BEFORE REWRITE####
 
 ##user inputs for debugging
 # sample_size=100;
@@ -50,12 +75,12 @@ pval <- function(hA,sample_size,simulate_data){
 #pbinom with lower.tail=F takes >x, but we want >= : this means we need a -1
 #beware: the -1's are in here for totally conceptually different reasons
 #for the two sided test we'll assume a symmetric rejection interval (ie. equal mass in lower and upper tail)
-theory_reject_prob <- function(hA,sig_level,sample_size,p){
+theory_reject_prob <- function(hA,sig_level,sample_size,p,p0=0.5){
   out <- switch(hA, 
-                "two.sided"<- pbinom(qbinom(sig_level/2,sample_size,0.5, lower.tail=T)-1,sample_size,p,lower.tail=T) + 
-                    pbinom(qbinom(sig_level/2,sample_size,0.5, lower.tail=F)-1,sample_size,p,lower.tail=F),
-                "less" = pbinom(qbinom(sig_level,sample_size,0.5, lower.tail=T)-1,sample_size,p,lower.tail=T),
-                "greater" = pbinom(qbinom(sig_level,sample_size,0.5, lower.tail=F)-1,sample_size,p,lower.tail=F)
+                "two.sided"<- pbinom(qbinom(sig_level/2,sample_size,p0, lower.tail=T)-1,sample_size,p,lower.tail=T) + 
+                    pbinom(qbinom(sig_level/2,sample_size,p0, lower.tail=F)-1,sample_size,p,lower.tail=F),
+                "less" = pbinom(qbinom(sig_level,sample_size,p0, lower.tail=T)-1,sample_size,p,lower.tail=T),
+                "greater" = pbinom(qbinom(sig_level,sample_size,p0, lower.tail=F)-1,sample_size,p,lower.tail=F)
   )
     round(1000*out)/1000 #3 decimal place display
 }
