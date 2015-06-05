@@ -7,9 +7,9 @@ isimHeaderPanel <- function(appTitle,windowTitle=appTitle){
 
 shinyUI(
   fluidPage(
+    theme="bootswatch_cerulean.css",
     includeCSS("www/isim_header.css"),
-    isimHeaderPanel("Statistical Testing II")
-    ,
+    isimHeaderPanel("Statistical Testing II"),
       
   navbarPage("Proportions",
     #title=div(img(src="isim_header_logo_no_padding.svg"), "My Title in the Navbar"),

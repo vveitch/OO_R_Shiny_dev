@@ -14,6 +14,7 @@ catNames = list( "Sex","BMIcat")
 quantNames = list("BMIquant" ,  "Age"     ,   "DGestimate", "DGerror"  ,  "SBestimate", "SBerror")
 
 shinyUI(fluidPage(
+  theme="bootswatch_cerulean.css",
   includeCSS("www/isim_header.css"),
   isimHeaderPanel("Visualizing the Skeleton Data"),
   
