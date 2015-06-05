@@ -1,17 +1,28 @@
 # ui.R
-library(markdown)
 
-shinyUI(navbarPage("Statistical Tests 2",
-                   tabPanel("Biased Coin",
+#need to include includeCSS("www/isim_header.css") in the fluidpage environment
+isimHeaderPanel <- function(appTitle,windowTitle=appTitle){
+  tags$div(class="header",HTML(paste("<div class=\"text\"><h1>",as.character(appTitle),"</h1></div><div class=\"image\"></div>")))
+}
+
+shinyUI(
+  fluidPage(
+    includeCSS("www/isim_header.css"),
+    isimHeaderPanel("Statistical Testing II")
+    ,
+      
+  navbarPage("Proportions",
+    #title=div(img(src="isim_header_logo_no_padding.svg"), "My Title in the Navbar"),
+                   tabPanel("Single Sample",
                             sidebarLayout(
                               sidebarPanel(
                                 
                                 numericInput("sample_size", label = h3("Sample size"), value = 100, min=10, max=1000),
                                 
-                                sliderInput("true_prob", label = h3("True probability p"), min = 0, 
-                                            max = 1, value = 0.6),
+                                sliderInput("true_prob", label = h3("True probability p"), step=0.005,
+                                            min = 0, max = 1, value = 0.6),
                                 
-                                sliderInput("null_prob", label = HTML("<h3>Null hypothesis p<sub>0</sub></h3>"), 
+                                sliderInput("null_prob", label = HTML("<h3>Null hypothesis p<sub>0</sub></h3>"), step=0.005,
                                             min = 0, max = 1, value = 0.5),
                                 
                                 selectInput("hA", label = h3("Alternative hypothesis"), 
@@ -37,11 +48,11 @@ shinyUI(navbarPage("Statistical Tests 2",
                                 
                                 numericInput("te.sample_size", label = h3("Sample size"), value = 100, min=10, max=1000),
                                 
-                                sliderInput("te.true_prob_A", label = HTML("<h3>True probability p<sub>A</sub></h3>"), min = 0, 
-                                            max = 1, value = 0.6),
+                                sliderInput("te.true_prob_A", label = HTML("<h3>True probability p<sub>A</sub></h3>"), step=0.005,
+                                            min = 0, max = 1, value = 0.6),
                                 
-                                sliderInput("te.true_prob_B", label = HTML("<h3>True probability p<sub>B</sub></h3>"), min = 0, 
-                                            max = 1, value = 0.4),
+                                sliderInput("te.true_prob_B", label = HTML("<h3>True probability p<sub>B</sub></h3>"), step=0.005,
+                                            min = 0, max = 1, value = 0.4),
                                 
                                 #                                 sliderInput("te.effect_size", label = HTML("<h3>Null hypothesis effect size e<sub>0</sub></h3>"), 
                                 #                                             min = 0, max = 1, value = 0.5),
@@ -71,11 +82,11 @@ shinyUI(navbarPage("Statistical Tests 2",
                                 
                                 numericInput("tu.sample_size_B", label = h3("Sample size B"), value = 100, min=10, max=1000),
                                
-                                sliderInput("tu.true_prob_A", label = HTML("<h3>True probability p<sub>A</sub></h3>"), min = 0, 
-                                            max = 1, value = 0.6),
+                                sliderInput("tu.true_prob_A", label = HTML("<h3>True probability p<sub>A</sub></h3>"), step=0.005,
+                                            min = 0, max = 1, value = 0.6),
                                 
-                                sliderInput("tu.true_prob_B", label = HTML("<h3>True probability p<sub>B</sub></h3>"), min = 0, 
-                                            max = 1, value = 0.4),
+                                sliderInput("tu.true_prob_B", label = HTML("<h3>True probability p<sub>B</sub></h3>"), step=0.005,
+                                            min = 0, max = 1, value = 0.4),
                                 
                                 selectInput("tu.hA", label = h3("Alternative hypothesis"), 
                                             choices = 
@@ -94,39 +105,4 @@ shinyUI(navbarPage("Statistical Tests 2",
                               )
                             )
                    )
-))
-
-# shinyUI(fluidPage(
-#   titlePanel("Statistical Power"),
-#   
-#   sidebarLayout(
-#     sidebarPanel(
-#       helpText("Examine outcomes of binomial experiments."),
-#       
-#       numericInput("sample_size", label = h3("Sample size"), value = 100, min=10, max=1000),
-#       
-#       numericInput("num_trials", label = h3("Number of repeated experiments"), value = 100, min=1, max=1000),
-#       
-#       sliderInput("effect_size", label = h3("True probability p"), min = 0, 
-#                   max = 1, value = 0.6),
-#       
-#       selectInput("hA", label = h3("Alternative hypothesis"), 
-#                   choices = 
-#                     list("p not equal 0.5" = "two_side", "p<0.5" = "<0.5", "p>0.5" = ">0.5"), 
-#                   selected = ">0.5"),
-#       
-#       sliderInput("sig_level", 
-#                   label = HTML("<h3>Significance level &alpha;:</h3>"),
-#                   min = 0, 
-#                   max = 0.5, value = 0.05)
-#       
-#     ),
-#     
-#     mainPanel(
-#       verbatimTextOutput("summary"),  
-#       plotOutput("dataHist"),
-#       plotOutput("pValHist")
-#       
-#       )
-#   )
-# ))
+)))

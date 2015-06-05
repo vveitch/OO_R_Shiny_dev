@@ -1,5 +1,10 @@
 # ui.R
 
+#need to include includeCSS("www/isim_header.css") in the fluidpage environment
+isimHeaderPanel <- function(appTitle,windowTitle=appTitle){
+  tags$div(class="header",HTML(paste("<div class=\"text\"><h1>",as.character(appTitle),"</h1></div><div class=\"image\"></div>")))
+}
+
 ##TODO: to get the data selection thing to work see http://shiny.rstudio.com/articles/dynamic-ui.html for advice on dynamic UI
 ##eventually I'll probably want custom files corresponding to each dataset giving variable names and whatnot 
 
@@ -9,7 +14,8 @@ catNames = list( "Sex","BMIcat")
 quantNames = list("BMIquant" ,  "Age"     ,   "DGestimate", "DGerror"  ,  "SBestimate", "SBerror")
 
 shinyUI(fluidPage(
-  titlePanel("Visualizing the Skeleton Data"),
+  includeCSS("www/isim_header.css"),
+  isimHeaderPanel("Visualizing the Skeleton Data"),
   
   sidebarLayout(
     sidebarPanel(
@@ -34,19 +40,12 @@ shinyUI(fluidPage(
         condition = "input.plotType == \"pie\" || input.plotType == \"bar\"",
         selectInput("mainCatVar", "Variable of interest",
                     catNames)
-      ),
-      
-              br(),
-              br(),
-              br(),
-              br(),
-              img(src = "isim_logo.jpg", height = 72, width = 72),
-              "Introduction to Statistical Ideas and Methods"
+      )
       
     ),
     
     mainPanel(
-      
+
       plotOutput("dataPlot"),    
       
       h3("Data Summary:"),

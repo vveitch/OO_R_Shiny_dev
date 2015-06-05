@@ -66,7 +66,8 @@ shinyServer(function(input, output, session) {
   output$tu.summary <- renderPrint(format_output((tu.samp_pwr())(input$tu.sample_size_A,input$tu.sample_size_B)))
   
   powerdf <- reactive({
-    power<-vapply(1:10000, function(x) (tu.samp_pwr())(nA[x],nB[x]), 1)
+    power <- vector(mode="double",length=10000);
+    power<-vapply(1:10000, function(x) (tu.samp_pwr())(nA[x],nB[x]), 1.0);
     data.frame(nA,nB,power)
     })
   

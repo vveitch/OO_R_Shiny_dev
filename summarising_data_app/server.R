@@ -2,6 +2,7 @@
 
 library(ggplot2)
 library(lattice)
+source("summarising_data_app_logic.R")
 
 ##See http://shiny.rstudio.com/articles/dynamic-ui.html for advice on dynamic UI
 
@@ -55,21 +56,6 @@ shinyServer(function(input, output) {
            "bar" = barplot(table(data[mainVarName()])),
     )
   })
-  
-  #extends summary to give mean and s.d. when applied to a numeric input and relative frequencies when applied to categorical input
-  data_summary <- function(input_vec){
-    if (is.numeric(input_vec)) {
-      sd_stuff <- round(sd(input_vec)*100)/100;
-      names(sd_stuff)<-"s.d.";
-      as.table(c(summary(input_vec),sd_stuff))
-    } else {
-      tabby <- table(input_vec);
-      tabby <- rbind(tabby,
-                     round(1000*table(input_vec)/sum(table(input_vec)))/1000);
-      rownames(tabby)<-c("Counts","Rel. Freqs.");
-      tabby
-    }
-  }
   
   # Generate a summary of the data
   output$summary <- renderPrint({
