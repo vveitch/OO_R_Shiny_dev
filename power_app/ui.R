@@ -12,7 +12,6 @@ shinyUI(
     isimHeaderPanel("Statistical Testing II"),
       
   navbarPage("Proportions",
-    #title=div(img(src="isim_header_logo_no_padding.svg"), "My Title in the Navbar"),
                    tabPanel("Single Sample",
                             sidebarLayout(
                               sidebarPanel(

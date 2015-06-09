@@ -59,22 +59,23 @@ shinyServer(function(input, output) {
   
   # Generate a summary of the data
   output$summary <- renderPrint({
-    if (input$sepVar=="none" || !(is.numeric(data[[mainVarName()]]))){
-      data_summary(data[[mainVarName()]])  
+    if (!(is.numeric(data[[mainVarName()]])))
+      isimPrintTable(data_summary(data[[mainVarName()]]))
+    else if (input$sepVar=="none" && (is.numeric(data[[mainVarName()]])) ){
+      isimPrintSummary(data_summary(data[[mainVarName()]]))
     } 
     #this gives a summary for each level of the selected grouping factor. Awkward coding for rshiny reasons
-    else if (is.numeric(data[[mainVarName()]])) {
+    else {
       summary_list<-tapply(data[[mainVarName()]],data[[input$sepVar]],data_summary);
       acc=summary_list[[1]]
       for (i in 2:length(summary_list)){
         acc<-rbind(acc,summary_list[[i]]);
       }
+   
       rownames(acc)<-names(summary_list);
-      acc
-      
+      acc<-as.table(acc); #correct format for fixed number of decimal places
+      isimPrintSummary(acc)      
     }
-    
-        
   })
 })  
 
