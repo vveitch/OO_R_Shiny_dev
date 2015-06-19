@@ -123,7 +123,14 @@ shinyServer(function(input, output, session) {
   
   powerdf <- reactive({
     power <- vector(mode="double",length=10000);
-    power<-vapply(1:10000, function(x) (tu.samp_pwr())(nA[x],nB[x]), 1.0);
+    #recall that we require np>10 to treat normal approx as valid  
+    power<-vapply(1:10000, 
+                  function(x) if ((nA[x]*input$tu.true_prob_A > 10) && (nA[x]*(1-input$tu.true_prob_A) > 10)
+                                  && (nB[x]*input$tu.true_prob_B > 10) && (nB[x]*(1-input$tu.true_prob_B) > 10)){
+                    (tu.samp_pwr())(nA[x],nB[x])
+                  } else {
+                    0
+                  }, 1.0)
     data.frame(nA,nB,power)
   })
   
