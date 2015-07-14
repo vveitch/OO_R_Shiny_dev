@@ -1,0 +1,20 @@
+/*.header {
+    border:2px solid red;
+}*/
+
+.header .image {
+    background: url(isim_header_logo.svg) 
+                no-repeat;
+    width: 163.73px;
+    height: 69.76px;
+    float:right  
+}
+
+.header .text {
+    font: x-large sans-serif;
+}
+
+.header .text, 
+.header .image {
+    display: inline-block;
+}
