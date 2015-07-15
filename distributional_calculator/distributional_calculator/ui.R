@@ -15,20 +15,35 @@ shinyUI(
                tabPanel("Percentile",
                         sidebarLayout(
                           sidebarPanel(
+
+                            ##original included more distributions, just uncomment this and comment other list to get that to work again
+#                             radioButtons("p_randist", "Choose the probability distribution:",
+#                                          
+#                                          list("continuous uniform" = "uniform",
+#                                               
+#                                               "binomial" = "binomial", 
+#                                               
+#                                               "normal" = "normal", 
+#                                               
+#                                               "t-distribution" = "t",
+#                                               
+#                                               "Poisson" = "Poisson", 
+#                                               
+#                                               "geometric" = "geometric", 
+#                                               
+#                                               "exponential" = "exponential"
+#                                               
+#                                          )),
                             
                             radioButtons("p_randist", "Choose the probability distribution:",
                                          
-                                         list("uniform" = "uniform",
+                                         list("continuous uniform" = "uniform",
                                               
                                               "binomial" = "binomial", 
                                               
                                               "normal" = "normal", 
                                               
-                                              "Poisson" = "Poisson", 
-                                              
-                                              "geometric" = "geometric", 
-                                              
-                                              "exponential" = "exponential"
+                                              "t-distribution" = "t"
                                               
                                          )),
                             
@@ -70,6 +85,13 @@ shinyUI(
                                              
                             ),
                             
+                            conditionalPanel(condition = "input.p_randist =='t'",
+                                             
+                                             helpText("t-Distribution Parameters"),
+                                             
+                                             numericInput("p_df", "Degrees of Freedom", 10)
+                                             
+                            ),
                             
                             
                             conditionalPanel(condition = "input.p_randist =='Poisson'",
@@ -102,8 +124,16 @@ shinyUI(
                             
                             
                             
-                            numericInput("p_x", "Enter the required percentile",  0.5)  
-                          ),
+                            numericInput("p_x", "Enter the required percentile",  0.5),
+                            
+                            helpText(   a("Adapted from John Braun",     
+                                          href="http://www.stats.uwo.ca/faculty/braun/RTricks/RTricks.php", 
+                                          target="_blank",
+                                          style="font-size:8pt"))
+                            
+                          
+                            
+                            ),
                           
                           
                           
@@ -134,20 +164,35 @@ shinyUI(
                tabPanel("Quantile",
                         sidebarLayout(
                           sidebarPanel(
+                          
+                            ##to enable extra distributions uncomment this and comment the list that follows
+#                             radioButtons("q_randist", "Choose the probability distribution:",
+#                                          
+#                                          list("continuous uniform" = "uniform",
+#                                               
+#                                               "binomial" = "binomial", 
+#                                               
+#                                               "normal" = "normal", 
+#                                               
+#                                               "t-distribution"="t",
+#                                               
+#                                               "Poisson" = "Poisson", 
+#                                               
+#                                               "geometric" = "geometric", 
+#                                               
+#                                               "exponential" = "exponential"
+#                                               
+#                                          )),
                             
                             radioButtons("q_randist", "Choose the probability distribution:",
                                          
-                                         list("uniform" = "uniform",
+                                         list("continuous uniform" = "uniform",
                                               
                                               "binomial" = "binomial", 
                                               
                                               "normal" = "normal", 
                                               
-                                              "Poisson" = "Poisson", 
-                                              
-                                              "geometric" = "geometric", 
-                                              
-                                              "exponential" = "exponential"
+                                              "t-distribution"="t"
                                               
                                          )),
                             
@@ -189,7 +234,13 @@ shinyUI(
                                              
                             ),
                             
-                            
+                            conditionalPanel(condition = "input.q_randist =='t'",
+                                             
+                                             helpText("t-Distribution Parameters"),
+                                             
+                                             numericInput("q_df", "Degrees of Freedom", 10)
+                                             
+                            ),
                             
                             conditionalPanel(condition = "input.q_randist =='Poisson'",
                                              
@@ -221,8 +272,12 @@ shinyUI(
                             
                             
                             
-                            numericInput("q_x", "Enter the value (x):",  0)
+                            numericInput("q_x", "Enter the value (x):",  0),
                             
+                            helpText(   a("Adapted from John Braun",     
+                                          href="http://www.stats.uwo.ca/faculty/braun/RTricks/RTricks.php", 
+                                          target="_blank",
+                                          style="font-size:8pt"))
                             
                             
                             
@@ -237,7 +292,7 @@ shinyUI(
                             
                             
                             
-                            h4("Probability Below x:"),
+                            h4("Probability less than or equal x:"),
                             
                             
                             
@@ -254,4 +309,5 @@ shinyUI(
                           )
                         )
                )
-    )))
+    ))
+)

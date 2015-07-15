@@ -60,6 +60,17 @@ shinyServer(function(input, output){
       percentile <- qnorm(x, mu, sigma)
       
     }
+
+    if (input$p_randist=="t") {
+      
+      df <- input$p_df
+      
+      #I really think this is a stupid thing to do, but I put it in for consistency w the other ones -Victor
+      if (is.na(df)) df <- 10
+      
+      percentile <- qt(x, df)
+      
+    }
     
     if (input$p_randist=="Poisson") {
       
@@ -131,11 +142,12 @@ shinyServer(function(input, output){
         
         cutoff <- percentile_datainput()
         
-        gridShadedCurve(dunif(x, input$p_min, input$p_max), 
-                        
-                        from=lower, to=upper, fromfill=lower, tofill=cutoff, 
-                        
-                        ylab="probability density", main="True Distribution")
+        #the +- epsilon is a hack to get around different edge behaviours of the fill and the curve drawing
+        gridShadedCurve(dunif(x, input$p_min+10^-8, input$p_max-10^-8), 
+
+                        from=lower, to=upper, fromfill=input$p_min, tofill=cutoff, 
+  
+  ylab="probability density", main="True Distribution")
         
         grid.text(x=unit(cutoff, "native"), y=-.075, paste("x =", cutoff))
         
@@ -150,7 +162,7 @@ shinyServer(function(input, output){
         quant <- floor(percentile_datainput())
         colour <- c(rep(scheme_colour,quant+1),rep("#ffffff",input$p_size-quant))
         
-        barplot(x, ylab="Frequency", main="True Distribution", col=colour)
+        barplot(x, ylab="Probability", col=colour)
       }
       
       if (input$p_randist=="normal") {
@@ -170,7 +182,31 @@ shinyServer(function(input, output){
         grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ",cutoff))
         
       } 
-      
+  
+  if (input$p_randist=="t") {
+    
+    sigma = if (input$p_df > 2) {
+      sqrt(input$p_df/(input$p_df-2))
+    } else {
+      5 #pretty arbitrary
+    }
+    
+    lower <- -4*sigma
+    
+    upper <- 4*sigma
+    
+    cutoff <- percentile_datainput()
+    
+    gridShadedCurve(dt(x, input$p_df), 
+                    
+                    from=lower, to=upper, fromfill=lower, tofill=cutoff, 
+                    
+                    ylab="probability density", main="True Distribution")
+    
+    grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ",cutoff))
+    
+  } 
+  
       if (input$p_randist=="Poisson") {
         
         lower <- as.integer(max(0, input$p_lambda - 4*sqrt(input$p_lambda)))
@@ -184,7 +220,7 @@ shinyServer(function(input, output){
         quant_index <- floor(percentile_datainput()-lower)
         colour <- c(rep(scheme_colour,quant_index+1),rep("#ffffff",upper-lower-quant_index))
         
-        barplot(x, ylab="Frequency", main="True Distribution", col=colour)
+        barplot(x, ylab="Probability", col=colour)
         
       } 
       
@@ -203,7 +239,7 @@ shinyServer(function(input, output){
         quant_index <- floor(percentile_datainput()-lower)
         colour <- c(rep(scheme_colour,quant_index+1),rep("#ffffff",upper-lower-quant_index))
         
-        barplot(x, ylab="Frequency", main="True Distribution", col=colour)
+        barplot(x, ylab="Probability", col=colour)
         
         
         
@@ -282,6 +318,18 @@ shinyServer(function(input, output){
       
     }
     
+    if (input$q_randist=="t") {
+      
+      df <- input$q_df
+      
+      #I really think this is a stupid thing to do, but I put it in for consistency w the other ones -Victor
+      if (is.na(df)) df <- 10
+      
+      probability <- pt(x, df)
+      
+    }
+    
+    
     if (input$q_randist=="Poisson") {
       
       lambda <- input$q_lambda
@@ -353,9 +401,9 @@ shinyServer(function(input, output){
         
         cutoff <- input$q_x
         
-        gridShadedCurve(dunif(x, input$q_min, input$q_max), 
+        gridShadedCurve(dunif(x, input$p_min+10^-8, input$p_max-10^-8), 
                         
-                        from=lower, to=upper, fromfill=lower, tofill=cutoff, 
+                        from=lower, to=upper, fromfill=input$p_min, tofill=cutoff, 
                         
                         ylab="probability density", main="True Distribution")
         
@@ -373,7 +421,7 @@ shinyServer(function(input, output){
         
         colour <- c(rep(scheme_colour,input$q_x+1),rep("#ffffff",input$q_size-input$q_x))
         
-        barplot(x, ylab="Frequency", main="True Distribution", col=colour)
+        barplot(x, ylab="Probability",  col=colour)
         
       }
       
@@ -395,6 +443,31 @@ shinyServer(function(input, output){
         
       } 
       
+      if (input$q_randist=="t") {
+        
+        sigma = if (input$q_df > 2) {
+          sqrt(input$q_df/(input$q_df-2))
+        } else {
+          5 #pretty arbitrary
+        }
+        
+        lower <- -4*sigma
+        
+        upper <- 4*sigma
+        
+        cutoff <- input$q_x
+        
+        gridShadedCurve(dt(x, input$p_df), 
+                        
+                        from=lower, to=upper, fromfill=lower, tofill=cutoff, 
+                        
+                        ylab="probability density", main="True Distribution")
+        
+        grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ",cutoff))
+        
+      } 
+      
+      
       if (input$q_randist=="Poisson") {
         
         lower <- as.integer(max(0, input$q_lambda - 4*sqrt(input$q_lambda)))
@@ -409,7 +482,7 @@ shinyServer(function(input, output){
         colour <- c(rep(scheme_colour,quant_index+1),rep("#ffffff",upper-lower-quant_index))
         
         
-        barplot(x, ylab="Frequency", main="True Distribution", col=colour)
+        barplot(x, ylab="Probability",  col=colour)
         
       } 
       
@@ -430,7 +503,7 @@ shinyServer(function(input, output){
         quant_index <- floor(input$q_x-lower)
         colour <- c(rep(scheme_colour,quant_index+1),rep("#ffffff",upper-lower-quant_index))
         
-        barplot(x, ylab="Frequency", main="True Distribution", col=colour)
+        barplot(x, ylab="Probability", col=colour)
         
         
         
