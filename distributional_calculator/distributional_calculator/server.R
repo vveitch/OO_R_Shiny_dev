@@ -1,6 +1,6 @@
 #Victor Veitch
-#14-07-2015
-#modified code from ???? see ????
+#15-07-2015
+#adapted from code by John Braun
 
 library(shiny)
 
@@ -12,264 +12,7 @@ scheme_colour <- "#2fa4e7"
 shinyServer(function(input, output){
   
 
-  ###PERCENTILE LOGIC
-  percentile_datainput <- reactive({ 
-    
-    
-    
-    x <- input$p_x
-    
-    if (input$p_randist=="uniform") {
-      
-      m <- input$p_min
-      
-      M <- input$p_max  
-      
-      if (is.na(m)) m <- 0
-      
-      if (is.na(M)) M <- 1
-      
-      percentile <- qunif(x, m, M)
-      
-    } 
-    
-    if (input$p_randist=="binomial") {
-      
-      m <- input$p_size
-      
-      p <- input$p_prob 
-      
-      if (is.na(m)) m <- 1
-      
-      if (is.na(p)) p <- .5
-      
-      percentile <- qbinom(x, size=m, prob=p)
-      
-    }
-    
-    if (input$p_randist=="normal") {
-      
-      mu <- input$p_mu
-      
-      sigma <- input$p_sigma 
-      
-      if (is.na(mu)) mu <- 0
-      
-      if (is.na(sigma)) sigma <- 1
-      
-      percentile <- qnorm(x, mu, sigma)
-      
-    }
-
-    if (input$p_randist=="t") {
-      
-      df <- input$p_df
-      
-      #I really think this is a stupid thing to do, but I put it in for consistency w the other ones -Victor
-      if (is.na(df)) df <- 10
-      
-      percentile <- qt(x, df)
-      
-    }
-    
-    if (input$p_randist=="Poisson") {
-      
-      lambda <- input$p_lambda
-      
-      if (is.na(lambda)) lambda <- 1
-      
-      percentile <- qpois(x, lambda)
-      
-    }
-    
-    if (input$p_randist=="geometric") {
-      
-      gprob <- input$p_gprob
-      
-      if (is.na(gprob)) gprob <- 0.5
-      
-      percentile <- qgeom(x, gprob)
-      
-    }
-    
-    if (input$p_randist=="exponential") {
-      
-      rate <- input$p_rate
-      
-      if (is.na(rate)) rate <- 1
-      
-      percentile <- qexp(x, rate)
-      
-    }
-    
-    percentile
-    
-  })
-  
-  
-  
-  
-  
-  output$percentile <- renderPrint({
-    
-    value <- percentile_datainput()
-    
-    value
-    
-  })
-  
-  
-  
-  
-  
-  
-  
-  output$percentile_graph <- renderPlot({
-    
-      
-      
-      pushViewport(viewport(width=.925, height=.85))
-      
-      
-      
-      if (input$p_randist=="uniform") {
-        
-        ran <- input$p_max-input$p_min
-        
-        lower <- input$p_min-.5*ran
-        
-        upper <- input$p_max+.5*ran
-        
-        cutoff <- percentile_datainput()
-        
-        #the +- epsilon is a hack to get around different edge behaviours of the fill and the curve drawing
-        gridShadedCurve(dunif(x, input$p_min+10^-8, input$p_max-10^-8), 
-
-                        from=lower, to=upper, fromfill=input$p_min, tofill=cutoff, 
-  
-  ylab="probability density", main="True Distribution")
-        
-        grid.text(x=unit(cutoff, "native"), y=-.075, paste("x =", cutoff))
-        
-      } 
-      
-      if (input$p_randist=="binomial") {
-        
-        x <- dbinom(0:input$p_size, input$p_size, input$p_prob)
-        
-        names(x) <- 0:input$p_size
-        
-        quant <- floor(percentile_datainput())
-        colour <- c(rep(scheme_colour,quant+1),rep("#ffffff",input$p_size-quant))
-        
-        barplot(x, ylab="Probability", col=colour)
-      }
-      
-      if (input$p_randist=="normal") {
-        
-        lower <- input$p_mu - 4*input$p_sigma
-        
-        upper <- input$p_mu + 4*input$p_sigma
-        
-        cutoff <- percentile_datainput()
-        
-        gridShadedCurve(dnorm(x, input$p_mu, input$p_sigma), 
-                        
-                        from=lower, to=upper, fromfill=lower, tofill=cutoff, 
-                        
-                        ylab="probability density", main="True Distribution")
-        
-        grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ",cutoff))
-        
-      } 
-  
-  if (input$p_randist=="t") {
-    
-    sigma = if (input$p_df > 2) {
-      sqrt(input$p_df/(input$p_df-2))
-    } else {
-      5 #pretty arbitrary
-    }
-    
-    lower <- -4*sigma
-    
-    upper <- 4*sigma
-    
-    cutoff <- percentile_datainput()
-    
-    gridShadedCurve(dt(x, input$p_df), 
-                    
-                    from=lower, to=upper, fromfill=lower, tofill=cutoff, 
-                    
-                    ylab="probability density", main="True Distribution")
-    
-    grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ",cutoff))
-    
-  } 
-  
-      if (input$p_randist=="Poisson") {
-        
-        lower <- as.integer(max(0, input$p_lambda - 4*sqrt(input$p_lambda)))
-        
-        upper <- as.integer(input$p_lambda + 5*sqrt(input$p_lambda))
-        
-        x <- dpois(lower:upper, lambda=input$p_lambda)
-        
-        names(x) <- lower:upper
-        
-        quant_index <- floor(percentile_datainput()-lower)
-        colour <- c(rep(scheme_colour,quant_index+1),rep("#ffffff",upper-lower-quant_index))
-        
-        barplot(x, ylab="Probability", col=colour)
-        
-      } 
-      
-      if (input$p_randist=="geometric") {
-        
-        lower <- 0
-        
-        prob <- input$p_gprob
-        
-        upper <- as.integer(log(.001/prob)/log(1-prob))
-        
-        x <- dgeom(lower:upper, prob)
-        
-        names(x) <- lower:upper
-        
-        quant_index <- floor(percentile_datainput()-lower)
-        colour <- c(rep(scheme_colour,quant_index+1),rep("#ffffff",upper-lower-quant_index))
-        
-        barplot(x, ylab="Probability", col=colour)
-        
-        
-        
-      } 
-      
-      if (input$p_randist=="exponential") {
-        
-        lower <- -.001
-        
-        upper <- 1/input$p_rate + 5/input$p_rate
-        
-        cutoff <- input$p_x
-        
-        gridShadedCurve(dexp(x, input$p_rate), 
-                        
-                        from=lower, to=upper, fromfill=lower, tofill=cutoff, 
-                        
-                        ylab="probability density", main="True Distribution")
-        
-        grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ", cutoff))
-        
-      } 
-      
-    
-    
-  })
-  
-  
-  ##QUANTILE LOGIC
-  
+  ###Quantile LOGIC
   quantile_datainput <- reactive({ 
     
     
@@ -286,7 +29,7 @@ shinyServer(function(input, output){
       
       if (is.na(M)) M <- 1
       
-      probability <- punif(x, m, M)
+      quant <- qunif(x, m, M)
       
     } 
     
@@ -300,7 +43,7 @@ shinyServer(function(input, output){
       
       if (is.na(p)) p <- .5
       
-      probability <- pbinom(x, size=m, prob=p)
+      quant <- qbinom(x, size=m, prob=p)
       
     }
     
@@ -314,10 +57,10 @@ shinyServer(function(input, output){
       
       if (is.na(sigma)) sigma <- 1
       
-      probability <- pnorm(x, mu, sigma)
+      quant <- qnorm(x, mu, sigma)
       
     }
-    
+
     if (input$q_randist=="t") {
       
       df <- input$q_df
@@ -325,10 +68,9 @@ shinyServer(function(input, output){
       #I really think this is a stupid thing to do, but I put it in for consistency w the other ones -Victor
       if (is.na(df)) df <- 10
       
-      probability <- pt(x, df)
+      quant <- qt(x, df)
       
     }
-    
     
     if (input$q_randist=="Poisson") {
       
@@ -336,7 +78,7 @@ shinyServer(function(input, output){
       
       if (is.na(lambda)) lambda <- 1
       
-      probability <- 1 - ppois(x, lambda)
+      quant <- qpois(x, lambda)
       
     }
     
@@ -346,7 +88,7 @@ shinyServer(function(input, output){
       
       if (is.na(gprob)) gprob <- 0.5
       
-      probability <- pgeom(x, gprob)
+      quant <- qgeom(x, gprob)
       
     }
     
@@ -356,11 +98,11 @@ shinyServer(function(input, output){
       
       if (is.na(rate)) rate <- 1
       
-      probability <- pexp(x, rate)
+      quant <- qexp(x, rate)
       
     }
     
-    probability
+    quant
     
   })
   
@@ -368,10 +110,11 @@ shinyServer(function(input, output){
   
   
   
-  output$probability <- renderPrint({
+  output$quantile_output <- renderPrint({
     
     value <- quantile_datainput()
-    
+#      value <- probability_datainput()
+
     value
     
   })
@@ -384,10 +127,9 @@ shinyServer(function(input, output){
   
   output$quantile_graph <- renderPlot({
     
-    
       
       
-      pushViewport(viewport(width=.95, height=.85))
+      pushViewport(viewport(width=.925, height=.85))
       
       
       
@@ -399,15 +141,16 @@ shinyServer(function(input, output){
         
         upper <- input$q_max+.5*ran
         
-        cutoff <- input$q_x
+        cutoff <- quantile_datainput()
         
-        gridShadedCurve(dunif(x, input$p_min+10^-8, input$p_max-10^-8), 
-                        
-                        from=lower, to=upper, fromfill=input$p_min, tofill=cutoff, 
-                        
-                        ylab="probability density", main="True Distribution")
+        #the +- epsilon is a hack to get around different edge behaviours of the fill and the curve drawing
+        gridShadedCurve(dunif(x, input$q_min+10^-8, input$q_max-10^-8), 
+
+                        from=lower, to=upper, fromfill=input$q_min, tofill=cutoff, 
+  
+  ylab="probability density", main="True Distribution")
         
-        grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ", cutoff))
+        grid.text(x=unit(cutoff, "native"), y=-.075, paste("x =", cutoff))
         
       } 
       
@@ -417,12 +160,10 @@ shinyServer(function(input, output){
         
         names(x) <- 0:input$q_size
         
-        cutoff <- input$q_x
+        quant <- floor(quantile_datainput())
+        colour <- c(rep(scheme_colour,quant+1),rep("#ffffff",input$q_size-quant))
         
-        colour <- c(rep(scheme_colour,input$q_x+1),rep("#ffffff",input$q_size-input$q_x))
-        
-        barplot(x, ylab="Probability",  col=colour)
-        
+        barplot(x, ylab="Probability", col=colour)
       }
       
       if (input$q_randist=="normal") {
@@ -431,33 +172,9 @@ shinyServer(function(input, output){
         
         upper <- input$q_mu + 4*input$q_sigma
         
-        cutoff <- input$q_x
+        cutoff <- quantile_datainput()
         
         gridShadedCurve(dnorm(x, input$q_mu, input$q_sigma), 
-                        
-                        from=lower, to=upper, fromfill=lower, tofill=cutoff, 
-                        
-                        ylab="probability density", main="True Distribution")
-        
-        grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ",  cutoff))
-        
-      } 
-      
-      if (input$q_randist=="t") {
-        
-        sigma = if (input$q_df > 2) {
-          sqrt(input$q_df/(input$q_df-2))
-        } else {
-          5 #pretty arbitrary
-        }
-        
-        lower <- -4*sigma
-        
-        upper <- 4*sigma
-        
-        cutoff <- input$q_x
-        
-        gridShadedCurve(dt(x, input$p_df), 
                         
                         from=lower, to=upper, fromfill=lower, tofill=cutoff, 
                         
@@ -466,8 +183,31 @@ shinyServer(function(input, output){
         grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ",cutoff))
         
       } 
-      
-      
+  
+  if (input$q_randist=="t") {
+    
+    sigma = if (input$q_df > 2) {
+      sqrt(input$q_df/(input$q_df-2))
+    } else {
+      5 #pretty arbitrary
+    }
+    
+    lower <- -4*sigma
+    
+    upper <- 4*sigma
+    
+    cutoff <- quantile_datainput()
+    
+    gridShadedCurve(dt(x, input$q_df), 
+                    
+                    from=lower, to=upper, fromfill=lower, tofill=cutoff, 
+                    
+                    ylab="probability density", main="True Distribution")
+    
+    grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ",cutoff))
+    
+  } 
+  
       if (input$q_randist=="Poisson") {
         
         lower <- as.integer(max(0, input$q_lambda - 4*sqrt(input$q_lambda)))
@@ -478,11 +218,10 @@ shinyServer(function(input, output){
         
         names(x) <- lower:upper
         
-        quant_index <- floor(input$q_x-lower)
+        quant_index <- floor(quantile_datainput()-lower)
         colour <- c(rep(scheme_colour,quant_index+1),rep("#ffffff",upper-lower-quant_index))
         
-        
-        barplot(x, ylab="Probability",  col=colour)
+        barplot(x, ylab="Probability", col=colour)
         
       } 
       
@@ -498,9 +237,7 @@ shinyServer(function(input, output){
         
         names(x) <- lower:upper
         
-        cutoff <- input$q_x
-        
-        quant_index <- floor(input$q_x-lower)
+        quant_index <- floor(quantile_datainput()-lower)
         colour <- c(rep(scheme_colour,quant_index+1),rep("#ffffff",upper-lower-quant_index))
         
         barplot(x, ylab="Probability", col=colour)
@@ -518,6 +255,270 @@ shinyServer(function(input, output){
         cutoff <- input$q_x
         
         gridShadedCurve(dexp(x, input$q_rate), 
+                        
+                        from=lower, to=upper, fromfill=lower, tofill=cutoff, 
+                        
+                        ylab="probability density", main="True Distribution")
+        
+        grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ", cutoff))
+        
+      } 
+      
+    
+    
+  })
+  
+  
+  ##PROBABILITY LOGIC
+  
+  probability_datainput <- reactive({ 
+    
+    
+    
+    x <- input$pr_x
+    
+    if (input$pr_randist=="uniform") {
+      
+      m <- input$pr_min
+      
+      M <- input$pr_max  
+      
+      if (is.na(m)) m <- 0
+      
+      if (is.na(M)) M <- 1
+      
+      probability <- punif(x, m, M)
+      
+    } 
+    
+    if (input$pr_randist=="binomial") {
+      
+      m <- input$pr_size
+      
+      p <- input$pr_prob 
+      
+      if (is.na(m)) m <- 1
+      
+      if (is.na(p)) p <- .5
+      
+      probability <- pbinom(x, size=m, prob=p)
+      
+    }
+    
+    if (input$pr_randist=="normal") {
+      
+      mu <- input$pr_mu
+      
+      sigma <- input$pr_sigma 
+      
+      if (is.na(mu)) mu <- 0
+      
+      if (is.na(sigma)) sigma <- 1
+      
+      probability <- pnorm(x, mu, sigma)
+      
+    }
+    
+    if (input$pr_randist=="t") {
+      
+      df <- input$pr_df
+      
+      #I really think this is a stupid thing to do, but I put it in for consistency w the other ones -Victor
+      if (is.na(df)) df <- 10
+      
+      probability <- pt(x, df)
+      
+    }
+    
+    
+    if (input$pr_randist=="Poisson") {
+      
+      lambda <- input$pr_lambda
+      
+      if (is.na(lambda)) lambda <- 1
+      
+      probability <- 1 - ppois(x, lambda)
+      
+    }
+    
+    if (input$pr_randist=="geometric") {
+      
+      gprob <- input$pr_gprob
+      
+      if (is.na(gprob)) gprob <- 0.5
+      
+      probability <- pgeom(x, gprob)
+      
+    }
+    
+    if (input$pr_randist=="exponential") {
+      
+      rate <- input$pr_rate
+      
+      if (is.na(rate)) rate <- 1
+      
+      probability <- pexp(x, rate)
+      
+    }
+    
+    probability
+    
+  })
+  
+  
+  
+  
+  
+  output$probability <- renderPrint({
+    
+    value <- probability_datainput()
+    
+    value
+    
+  })
+  
+  
+  
+  
+  
+  
+  
+  output$prob_graph <- renderPlot({
+    
+    
+      
+      
+      pushViewport(viewport(width=.95, height=.85))
+      
+      
+      
+      if (input$pr_randist=="uniform") {
+        
+        ran <- input$pr_max-input$pr_min
+        
+        lower <- input$pr_min-.5*ran
+        
+        upper <- input$pr_max+.5*ran
+        
+        cutoff <- input$pr_x
+        
+        gridShadedCurve(dunif(x, input$pr_min+10^-8, input$pr_max-10^-8), 
+                        
+                        from=lower, to=upper, fromfill=input$pr_min, tofill=cutoff, 
+                        
+                        ylab="probability density", main="True Distribution")
+        
+        grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ", cutoff))
+        
+      } 
+      
+      if (input$pr_randist=="binomial") {
+        
+        x <- dbinom(0:input$pr_size, input$pr_size, input$pr_prob)
+        
+        names(x) <- 0:input$pr_size
+        
+        cutoff <- input$pr_x
+        
+        colour <- c(rep(scheme_colour,input$pr_x+1),rep("#ffffff",input$pr_size-input$pr_x))
+        
+        barplot(x, ylab="Probability",  col=colour)
+        
+      }
+      
+      if (input$pr_randist=="normal") {
+        
+        lower <- input$pr_mu - 4*input$pr_sigma
+        
+        upper <- input$pr_mu + 4*input$pr_sigma
+        
+        cutoff <- input$pr_x
+        
+        gridShadedCurve(dnorm(x, input$pr_mu, input$pr_sigma), 
+                        
+                        from=lower, to=upper, fromfill=lower, tofill=cutoff, 
+                        
+                        ylab="probability density", main="True Distribution")
+        
+        grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ",  cutoff))
+        
+      } 
+      
+      if (input$pr_randist=="t") {
+        
+        sigma = if (input$pr_df > 2) {
+          sqrt(input$pr_df/(input$pr_df-2))
+        } else {
+          5 #pretty arbitrary
+        }
+        
+        lower <- -4*sigma
+        
+        upper <- 4*sigma
+        
+        cutoff <- input$pr_x
+        
+        gridShadedCurve(dt(x, input$pr_df), 
+                        
+                        from=lower, to=upper, fromfill=lower, tofill=cutoff, 
+                        
+                        ylab="probability density", main="True Distribution")
+        
+        grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ",cutoff))
+        
+      } 
+      
+      
+      if (input$pr_randist=="Poisson") {
+        
+        lower <- as.integer(max(0, input$pr_lambda - 4*sqrt(input$pr_lambda)))
+        
+        upper <- as.integer(input$pr_lambda + 5*sqrt(input$pr_lambda))
+        
+        x <- dpois(lower:upper, lambda=input$pr_lambda)
+        
+        names(x) <- lower:upper
+        
+        quant_index <- floor(input$pr_x-lower)
+        colour <- c(rep(scheme_colour,quant_index+1),rep("#ffffff",upper-lower-quant_index))
+        
+        
+        barplot(x, ylab="Probability",  col=colour)
+        
+      } 
+      
+      if (input$pr_randist=="geometric") {
+        
+        lower <- 0
+        
+        prob <- input$pr_gprob
+        
+        upper <- as.integer(log(.001/prob)/log(1-prob))
+        
+        x <- dgeom(lower:upper, prob)
+        
+        names(x) <- lower:upper
+        
+        cutoff <- input$pr_x
+        
+        quant_index <- floor(input$pr_x-lower)
+        colour <- c(rep(scheme_colour,quant_index+1),rep("#ffffff",upper-lower-quant_index))
+        
+        barplot(x, ylab="Probability", col=colour)
+        
+        
+        
+      } 
+      
+      if (input$pr_randist=="exponential") {
+        
+        lower <- -.001
+        
+        upper <- 1/input$pr_rate + 5/input$pr_rate
+        
+        cutoff <- input$pr_x
+        
+        gridShadedCurve(dexp(x, input$pr_rate), 
                         
                         from=lower, to=upper, fromfill=lower, tofill=cutoff, 
                         

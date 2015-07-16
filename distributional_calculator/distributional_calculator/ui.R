@@ -1,4 +1,8 @@
 # ui.R
+#Victor Veitch
+#15-07-2015
+#adapted from code by John Braun
+
 
 #need to include includeCSS("www/isim_header.css") in the fluidpage environment
 isimHeaderPanel <- function(appTitle,windowTitle=appTitle){
@@ -11,13 +15,13 @@ shinyUI(
     includeCSS("www/isim_header.css"),
     isimHeaderPanel("Distributional Calculator"),
     
-    navbarPage("Plot Type",
-               tabPanel("Percentile",
+    navbarPage("Find a:",
+               tabPanel("Quantile",
                         sidebarLayout(
                           sidebarPanel(
 
                             ##original included more distributions, just uncomment this and comment other list to get that to work again
-#                             radioButtons("p_randist", "Choose the probability distribution:",
+#                             radioButtons("q_randist", "Choose the probability distribution:",
 #                                          
 #                                          list("continuous uniform" = "uniform",
 #                                               
@@ -35,155 +39,6 @@ shinyUI(
 #                                               
 #                                          )),
                             
-                            radioButtons("p_randist", "Choose the probability distribution:",
-                                         
-                                         list("continuous uniform" = "uniform",
-                                              
-                                              "binomial" = "binomial", 
-                                              
-                                              "normal" = "normal", 
-                                              
-                                              "t-distribution" = "t"
-                                              
-                                         )),
-                            
-                            br(),
-                            
-                            
-                            
-                            conditionalPanel(condition = "input.p_randist =='uniform'",
-                                             
-                                             helpText("Uniform Distribution Range"),
-                                             
-                                             numericInput("p_min", "Minimum value", 0),
-                                             
-                                             numericInput("p_max", "Maximum value", 1)
-                                             
-                            ),
-                            
-                            
-                            
-                            conditionalPanel(condition = "input.p_randist =='binomial'",
-                                             
-                                             helpText("Binomial Distribution Parameters"),
-                                             
-                                             numericInput("p_size", "Number of Trials", 1),
-                                             
-                                             numericInput("p_prob", "Probability of success", .5)
-                                             
-                            ),
-                            
-                            
-                            
-                            conditionalPanel(condition = "input.p_randist =='normal'",
-                                             
-                                             helpText("Normal Distribution Parameters"),
-                                             
-                                             numericInput("p_mu", "Mean", 0),
-                                             
-                                             numericInput("p_sigma", "Standard Deviation", 1)
-                                             
-                            ),
-                            
-                            conditionalPanel(condition = "input.p_randist =='t'",
-                                             
-                                             helpText("t-Distribution Parameters"),
-                                             
-                                             numericInput("p_df", "Degrees of Freedom", 10)
-                                             
-                            ),
-                            
-                            
-                            conditionalPanel(condition = "input.p_randist =='Poisson'",
-                                             
-                                             helpText("Poisson Distribution Parameter"),
-                                             
-                                             numericInput("p_lambda", "Mean", 1)
-                                             
-                            ),
-                            
-                            
-                            
-                            conditionalPanel(condition = "input.p_randist =='geometric'",
-                                             
-                                             helpText("Geometric Distribution Parameter"),
-                                             
-                                             numericInput("p_gprob", "Probability", 0.5)
-                                             
-                            ),
-                            
-                            
-                            
-                            conditionalPanel(condition = "input.p_randist =='exponential'",
-                                             
-                                             helpText("Exponential Distribution Parameter"),
-                                             
-                                             numericInput("p_rate", "Rate", 1)
-                                             
-                            ),
-                            
-                            
-                            
-                            numericInput("p_x", "Enter the required percentile",  0.5),
-                            
-                            helpText(   a("Adapted from John Braun",     
-                                          href="http://www.stats.uwo.ca/faculty/braun/RTricks/RTricks.php", 
-                                          target="_blank",
-                                          style="font-size:8pt"))
-                            
-                          
-                            
-                            ),
-                          
-                          
-                          
-                          
-                          
-                          mainPanel(
-                            
-                            
-                            
-                            h4("The percentile is:"),
-                            
-                            
-                            
-                            verbatimTextOutput("percentile"), 
-                            
-                            
-                            
-                            div(class="span6",plotOutput("percentile_graph", width = "500px", height = "500px",
-                                                         
-                                                         br(),downloadButton('png2','Printer-friendly Version')))
-                            
-                            
-                            
-                          )
-                          
-                        )
-               ),
-               tabPanel("Quantile",
-                        sidebarLayout(
-                          sidebarPanel(
-                          
-                            ##to enable extra distributions uncomment this and comment the list that follows
-#                             radioButtons("q_randist", "Choose the probability distribution:",
-#                                          
-#                                          list("continuous uniform" = "uniform",
-#                                               
-#                                               "binomial" = "binomial", 
-#                                               
-#                                               "normal" = "normal", 
-#                                               
-#                                               "t-distribution"="t",
-#                                               
-#                                               "Poisson" = "Poisson", 
-#                                               
-#                                               "geometric" = "geometric", 
-#                                               
-#                                               "exponential" = "exponential"
-#                                               
-#                                          )),
-                            
                             radioButtons("q_randist", "Choose the probability distribution:",
                                          
                                          list("continuous uniform" = "uniform",
@@ -192,7 +47,7 @@ shinyUI(
                                               
                                               "normal" = "normal", 
                                               
-                                              "t-distribution"="t"
+                                              "t-distribution" = "t"
                                               
                                          )),
                             
@@ -242,6 +97,7 @@ shinyUI(
                                              
                             ),
                             
+                            
                             conditionalPanel(condition = "input.q_randist =='Poisson'",
                                              
                                              helpText("Poisson Distribution Parameter"),
@@ -272,9 +128,157 @@ shinyUI(
                             
                             
                             
-                            numericInput("q_x", "Enter the value (x):",  0),
+                            numericInput("q_x", "Enter the required probability:",  0.5),
                             
-                            helpText(   a("Adapted from John Braun",     
+                            helpText(   a("Adapted from R Tricks for Kids",     
+                                          href="http://www.stats.uwo.ca/faculty/braun/RTricks/RTricks.php", 
+                                          target="_blank",
+                                          style="font-size:8pt"))
+                            
+                          
+                            
+                            ),
+                          
+                          
+                          
+                          
+                          
+                          mainPanel(
+                            
+                            
+                            
+                            h4("The quantile is:"),
+                            
+                            
+                             
+                             verbatimTextOutput("quantile_output"), 
+                            
+                            
+                            
+                            div(class="span6",plotOutput("quantile_graph", width = "500px", height = "500px",
+                                                         
+                                                         br(),downloadButton('png2','Printer-friendly Version')))
+                            
+                            
+                            
+                          )
+                          
+                        )
+               ),
+               tabPanel("Probability",
+                        sidebarLayout(
+                          sidebarPanel(
+                          
+                            ##to enable extra distributions uncomment this and comment the list that follows
+#                             radioButtons("pr_randist", "Choose the probability distribution:",
+#                                          
+#                                          list("continuous uniform" = "uniform",
+#                                               
+#                                               "binomial" = "binomial", 
+#                                               
+#                                               "normal" = "normal", 
+#                                               
+#                                               "t-distribution"="t",
+#                                               
+#                                               "Poisson" = "Poisson", 
+#                                               
+#                                               "geometric" = "geometric", 
+#                                               
+#                                               "exponential" = "exponential"
+#                                               
+#                                          )),
+                            
+                            radioButtons("pr_randist", "Choose the probability distribution:",
+                                         
+                                         list("continuous uniform" = "uniform",
+                                              
+                                              "binomial" = "binomial", 
+                                              
+                                              "normal" = "normal", 
+                                              
+                                              "t-distribution"="t"
+                                              
+                                         )),
+                            
+                            br(),
+                            
+                            
+                            
+                            conditionalPanel(condition = "input.pr_randist =='uniform'",
+                                             
+                                             helpText("Uniform Distribution Range"),
+                                             
+                                             numericInput("pr_min", "Minimum value", 0),
+                                             
+                                             numericInput("pr_max", "Maximum value", 1)
+                                             
+                            ),
+                            
+                            
+                            
+                            conditionalPanel(condition = "input.pr_randist =='binomial'",
+                                             
+                                             helpText("Binomial Distribution Parameters"),
+                                             
+                                             numericInput("pr_size", "Number of Trials", 1),
+                                             
+                                             numericInput("pr_prob", "Probability of success", .5)
+                                             
+                            ),
+                            
+                            
+                            
+                            conditionalPanel(condition = "input.pr_randist =='normal'",
+                                             
+                                             helpText("Normal Distribution Parameters"),
+                                             
+                                             numericInput("pr_mu", "Mean", 0),
+                                             
+                                             numericInput("pr_sigma", "Standard Deviation", 1)
+                                             
+                            ),
+                            
+                            conditionalPanel(condition = "input.pr_randist =='t'",
+                                             
+                                             helpText("t-Distribution Parameters"),
+                                             
+                                             numericInput("pr_df", "Degrees of Freedom", 10)
+                                             
+                            ),
+                            
+                            conditionalPanel(condition = "input.pr_randist =='Poisson'",
+                                             
+                                             helpText("Poisson Distribution Parameter"),
+                                             
+                                             numericInput("pr_lambda", "Mean", 1)
+                                             
+                            ),
+                            
+                            
+                            
+                            conditionalPanel(condition = "input.pr_randist =='geometric'",
+                                             
+                                             helpText("Geometric Distribution Parameter"),
+                                             
+                                             numericInput("pr_gprob", "Probability", 0.5)
+                                             
+                            ),
+                            
+                            
+                            
+                            conditionalPanel(condition = "input.pr_randist =='exponential'",
+                                             
+                                             helpText("Exponential Distribution Parameter"),
+                                             
+                                             numericInput("pr_rate", "Rate", 1)
+                                             
+                            ),
+                            
+                            
+                            
+                            numericInput("pr_x", "Enter the value (x):",  0),
+                            
+                            helpText(   a("Adapted from R Tricks for Kids",     
                                           href="http://www.stats.uwo.ca/faculty/braun/RTricks/RTricks.php", 
                                           target="_blank",
                                           style="font-size:8pt"))
@@ -300,7 +304,7 @@ shinyUI(
                             
                             
                             
-                            div(class="span6",plotOutput("quantile_graph", width = "500px", height = "500px",
+                            div(class="span6",plotOutput("prob_graph", width = "500px", height = "500px",
                                                          
                                                          br(),downloadButton('png2','Printer-friendly Version')))
                             
