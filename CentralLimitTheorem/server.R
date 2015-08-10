@@ -6,7 +6,15 @@
 library(ggvis)
 library(shiny)
 library(dplyr)
+library(sn)
 rm(list = ls())
+
+#fixed skew normal parameters
+omega=5;
+tau=0;
+
+#cerulean
+scheme_colour <- "#2fa4e7"
 
 shinyServer(function(input,output)
 {
@@ -22,10 +30,9 @@ shinyServer(function(input,output)
     pop.mean <- 5
     popOut <- renderText({ pop.mean })
     
-    # Initialize the observation and mean vectors
-    obsVec <- c(0)
-    meanVec <- mean(obsVec)
-    
+    # Initialize the mean vectors
+     meanVec <- numeric(0)
+#     
     # Create a reactive object storing the obsVec length
     obsVecLength <- reactive({
         input$obsClick
@@ -38,66 +45,73 @@ shinyServer(function(input,output)
         input$obsClick
         length(meanVec)
     })
-    
+
     # When the button is pressed, generate a new sample
     observe({
         input$obsClick
+        obsVec <<- rsn(input$sampleSize,omega=omega,alpha=input$skew,tau=tau) 
         meanVec <<- c(meanVec,mean(obsVec))
-        obsVec <<- rchisq(input$sampleSize,df = pop.mean)
     })
 
     
-    # Clear the means if the sample size changes
-    observe({
+    # Clear the means if the sample size or skew changes
+    cleared<-observe({
+        input$skew
         input$sampleSize
-        obsVec <<- c(0)
-        meanVec <<- c(0)
+        obsVec <<- numeric(0)
+        meanVec <<- numeric(0)
     })
     
     ### Make the plots ###
     
     # Initialize the density curve
     
-    basePlt <- reactive({
-        data.frame(x = seq(0,pop.mean*4,by = 0.1),
-                   y = dchisq(seq(0,pop.mean*4,by = 0.1),df = pop.mean)
-            ) %>%
-            mutate(xobs = c(obsVec,rep(0,length(x) - obsVecLength())),
-                   yobs = rep(0,length(x))
-            ) %>%
-            ggvis(~x,~y
-            ) %>%
-            layer_lines(
-            ) %>%
-            layer_points(~xobs,
-                        ~yobs,
-                        fill := 'orange',
-                        stroke := 'black',
-                        opacity := 0.7
-            ) %>%
-            add_tooltip(function(df) round(df$y,2)
-            ) %>%
-            add_axis('x',
-                     title = 'Observations',
-            ) %>%
-            add_axis('y',
-                     title = 'Density'
-            )
-    })
+basePlt <- reactive({
+  data.frame(x=obsVec, y=rep(0,obsVecLength())) %>%
+    ggvis() %>%
+    #scatter plot of the generated data points
+    layer_points(~x,
+                 ~y,
+                 fill := scheme_colour,
+                 stroke := 'black',
+                 opacity := 0.7
+    ) %>%
+    #density curve     
+    add_data(data = data.frame(xtick = seq(-omega*4,omega*4,by = 0.1), 
+                               yval=dsn(seq(-omega*4,omega*4,by = 0.1),omega=omega,alpha=input$skew,tau=tau))
+    ) %>% 
+    layer_paths(x = ~ xtick, y = ~ yval) %>%
+    #verticle line at sample mean. This is a total hack because appropriate functionality does not yet exist
+    add_data(data = data.frame(x_coords = c(meanVec[length(meanVec)],meanVec[length(meanVec)]),
+                               y_coords = c(0,0.16))
+    ) %>% 
+    layer_paths(x = ~ x_coords, y = ~ y_coords, stroke:=scheme_colour, strokeWidth := 4) %>%
+    scale_numeric("x", domain = c(-omega*4, omega*4), nice = FALSE) %>%
+    add_axis('x',
+             title = 'Observations',
+    ) %>%
+    add_axis('y',
+             title = 'Density'
+    )
+})
     
     # Make histogram of means
     
     histPlt <- reactive({
-        input$obsClick
-        input$sampleSize
-        data.frame(x = meanVec
+      #plot needs to be updated whenever any of these change
+      input$obsClick
+      input$sampleSize
+      input$skew
+      
+      data.frame(x = meanVec
             ) %>%
-            ggvis(~x
+            ggvis(~x, fill=scheme_colour
             ) %>%
             layer_histograms(
                 width = 0.2
             ) %>%
-            scale_numeric("x", domain = c(0, pop.mean*4), nice = FALSE) %>%
+            hide_legend("fill") %>%
+            scale_numeric("x", domain = c(-omega*4, omega*4), nice = FALSE) %>%
             add_axis('x',
                      title = 'Sample Means'
             ) %>%
@@ -112,14 +126,15 @@ shinyServer(function(input,output)
         input$obsClick
         input$sampleSize
         basePlt() %>% bind_shiny('basePlt')
-    })
-    
-    observe({
-        input$obsClick
-        input$sampleSize
         histPlt() %>% bind_shiny('histPlt')
-    })
+        
+        })
     
+#     observe({
+#       histPlt
+#         histPlt() %>% bind_shiny('histPlt')
+#     })
+#     
     # Display the current sample mean
     output$currentMean <- renderTable({
         input$obsClick
