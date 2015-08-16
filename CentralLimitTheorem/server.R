@@ -1,5 +1,5 @@
-##Code originally by Alex Stringer
-##substantive bug fixes and modifications by Victor Veitch
+##Victor Veitch
+##based on code originally by Alex Stringer
 ##10/08/2015
 
 
@@ -18,46 +18,46 @@ scheme_colour <- "#2fa4e7"
 
 shinyServer(function(input,output)
 {
-  # Create a reactive object storing the obsVec length
-  obsVecLength <- reactive({
-    input$obsClick
-    input$sampleSize
-    input$skew
-    length(obsVec)
-  })
   
-  #     # Create a reactive object storing the meanVec length
-  #     meanVecLength <- reactive({
-  #         input$obsClick
-  #         length(meanVec)
-  #     })
+  #store the simulated data in this expression so the plots know when to update
+  #contains:
+  #obsVec, the vector of most recent observations
+  #meanVec, the vector of sample means
+  simData <- reactiveValues()
   
-  
-  # Clear the means if the sample size or skew changes
+  # Clear the stored means if the sample size or skew changes
   cleared<-observe({
     input$skew
     input$sampleSize
-    obsVec <<- numeric(0)
-    meanVec <<- numeric(0)
+    simData$obsVec <- numeric(0)
+    simData$meanVec <- numeric(0)
   })
   
-  # When the button is pressed, generate a new sample
+  #When the button is pressed, generate a new sample
+  #this also triggers on input$sampleSize and input$skew
   observe({
     input$obsClick
-    #whenever skew or sample size is changed there should be a virtual button press after
-    input$skew
-    input$sampleSize
     
-    obsVec <<- rsn(input$sampleSize,omega=omega,alpha=input$skew,tau=tau) 
-    meanVec <<- c(meanVec,mean(obsVec))
+     obsVec <- 0
+     meanVec <- isolate(simData$meanVec)
+    #numTrials is isolated to allow for changes to this parameter without replotting 
+    for (i in 1:isolate(input$numTrials)){
+       obsVec <- rsn(input$sampleSize,omega=omega,alpha=input$skew,tau=tau) 
+       meanVec <- c(meanVec,mean(obsVec))
+     }
+     simData$obsVec <- obsVec
+     simData$meanVec <- meanVec
   })
+
+  output$totalTrials <- renderPrint(cat(paste("Total Number of Trials: ",length(simData$meanVec))))  
+  
   
   ### Make the plots ###
   
   # Initialize the density curve
   
   basePlt <- reactive({
-    data.frame(x=obsVec, y=rep(0,obsVecLength())) %>%
+    data.frame(x=simData$obsVec, y=rep(0,length(simData$obsVec))) %>%
       ggvis() %>%
       #scatter plot of the generated data points
       layer_points(~x,
@@ -71,8 +71,8 @@ shinyServer(function(input,output)
                                  yval=dsn(seq(-omega*4,omega*4,by = 0.1),omega=omega,alpha=input$skew,tau=tau))
       ) %>% 
       layer_paths(x = ~ xtick, y = ~ yval) %>%
-      #verticle line at sample mean. This is a total hack because appropriate functionality does not yet exist
-      add_data(data = data.frame(x_coords = c(meanVec[length(meanVec)],meanVec[length(meanVec)]),
+      #verticle line at sample mean. This is a total hack because appropriate functionality does not yet exist in ggvis
+      add_data(data = data.frame(x_coords = c(simData$meanVec[length(isolate(simData$meanVec))],simData$meanVec[length(isolate(simData$meanVec))]),
                                  y_coords = c(0,0.16))
       ) %>% 
       layer_paths(x = ~ x_coords, y = ~ y_coords, stroke:=scheme_colour, strokeWidth := 4) %>%
@@ -86,14 +86,8 @@ shinyServer(function(input,output)
   })
   
   # Make histogram of means
-  
   histPlt <- reactive({
-    #plot needs to be updated whenever any of these change
-    input$obsClick
-    input$sampleSize
-    input$skew
-    
-    data.frame(x = meanVec
+    data.frame(x = simData$meanVec
     ) %>%
       ggvis(~x, fill=scheme_colour
       ) %>%
@@ -111,14 +105,9 @@ shinyServer(function(input,output)
   })
   
   # Redeploy the plots when their properties change
-  
   observe({
-    input$obsClick
-    input$sampleSize
-    input$skew
     basePlt() %>% bind_shiny('basePlt')
     histPlt() %>% bind_shiny('histPlt')
-    
   })
   
 })

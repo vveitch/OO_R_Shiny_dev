@@ -12,15 +12,12 @@ isimHeaderPanel <- function(appTitle,windowTitle=appTitle){
 shinyUI(fluidPage(
   theme="bootswatch_cerulean.css",
   includeCSS("www/isim_header.css"),
-  isimHeaderPanel("Central Limit Theorem"),
+  isimHeaderPanel("Sampling Distribution of the Mean"),
   
     sidebarPanel(
         
-        actionButton('obsClick',
-                     'Generate A Sample'),
-        
         sliderInput('sampleSize',
-                    'Sample Size',
+                    'Sample Size per Trial',
                     min = 1,
                     max = 100,
                     value = 1,
@@ -31,14 +28,28 @@ shinyUI(fluidPage(
                     min = -20,
                     max = 20,
                     value = 0,
-                    step = 1)
+                    step = 1),
+        
+        sliderInput('numTrials',
+                    'Number of Trials',
+                    min=1,
+                    max=100,
+                    value=1,
+                    step=1),
+        
+        actionButton('obsClick',
+                     'Generate Samples')
+        
         
         
     ),
     
     mainPanel(
-        
+      
+        verbatimTextOutput("totalTrials"),
+        h3("Most Recent Trial:"),
         ggvis::ggvisOutput('basePlt'),
+        h3("Observed Sample Means:"),
         ggvis::ggvisOutput('histPlt')
         
     )
