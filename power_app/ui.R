@@ -25,9 +25,10 @@ shinyUI(
                                        sliderInput("null_prob", label = HTML("<h4>Null hypothesis p<sub>0</sub></h4>"), step=0.005,
                                                    min = 0, max = 1, value = 0.5),
                                        
+                                       #subscripts done with unicode here because (html) select does not support sub tag - this may hurt browser compatibility
                                        selectInput("hA", label = h4("Alternative hypothesis"), 
                                                    choices = 
-                                                     list("p not equal p0" = "two.sided", "p<p0" = "less", "p>p0" = "greater"), 
+                                                     list("p not equal p\u2080" = "two.sided", "p<p\u2080" = "less", "p>p\u2080" = "greater"), 
                                                    selected = ">0.5"),
                                        
                                        sliderInput("sig_level", 

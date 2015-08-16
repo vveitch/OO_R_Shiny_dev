@@ -24,8 +24,14 @@ shinyServer(function(input, output, session) {
   });
 
   
-  output$summary <- renderPrint(format_output((s.samp_pwr())
-                                              (input$sample_size,input$null_prob,input$sig_level)))
+  output$summary <- renderPrint( if (ceiling(max(10/input$true_prob,10/(1-input$true_prob)))>input$sample_size)
+  {
+  "Invalid Input" 
+  }else{
+    format_output((s.samp_pwr())
+                  (input$sample_size,input$null_prob,input$sig_level))    
+  }    
+)
   
   
   output$s.powerPlot <- renderPlot({
