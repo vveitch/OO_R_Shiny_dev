@@ -56,7 +56,12 @@ shinyUI(
                             )),
                           mainPanel(
                             verbatimTextOutput("summary"),
-                            plotOutput("s.powerPlot")
+                            
+                            div(class="span6", align="center", plotOutput("s.powerPlot", width = "100%", height = "500px", 
+                                                         
+                                                         br(),downloadButton('png2','Printer-friendly Version')))
+                            
+#                            plotOutput("s.powerPlot")
                             
                           )                            
                         )
@@ -102,7 +107,9 @@ shinyUI(
                             )),
                           mainPanel(
                             verbatimTextOutput("te.summary"),
-                            plotOutput("te.powerPlot")
+                            div(class="span6", align="center", plotOutput("te.powerPlot", width = "100%", height = "500px", 
+                                                                          
+                                                                          br(),downloadButton('png2','Printer-friendly Version')))
                           )
                         )
                ),
@@ -133,7 +140,11 @@ shinyUI(
                           ),
                           mainPanel(
                             verbatimTextOutput("tu.summary"),
-                            plotOutput("tu.powerPlot")
+                            div(class="span6", align="center", plotOutput("tu.powerPlot", width = "100%", height = "500px", 
+                                                                          
+                                                                          br(),downloadButton('png2','Printer-friendly Version')))
+                            
+
                           )
                         )
                )

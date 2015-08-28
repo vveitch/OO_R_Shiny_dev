@@ -47,7 +47,10 @@ shinyUI(fluidPage(
     
     mainPanel(
 
-      plotOutput("dataPlot"),    
+      div(class="span6", align="center", plotOutput("dataPlot", width = "100%", height = "500px", 
+                                                    
+                                                    br(),downloadButton('png2','Printer-friendly Version'))),
+  
       
       h3("Data Summary:"),
       verbatimTextOutput("summary")  

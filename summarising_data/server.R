@@ -46,7 +46,7 @@ shinyServer(function(input, output) {
            }else{
              p<-ggplot(data, aes_string(mainVarName(),fill=input$sepVar), main=paste(mainVarName()," blocked by ",input$sepVar)) + 
                geom_dotplot(stackgroups=TRUE,binwidth=1, method='histodot',
-                            dotsize=10/max(table(round(SkeletonDatacomplete[[mainVarName()]]))),
+                            dotsize=25/max(table(round(SkeletonDatacomplete[[mainVarName()]]))),
                             binpositions="all") +
                scale_y_continuous(name = "", breaks = NULL)
             print(p)
