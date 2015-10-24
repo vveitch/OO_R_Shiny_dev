@@ -17,27 +17,40 @@ shinyUI(fluidPage(
     
     #    HTML("<a href='http://psychoanalytix.com'> <img src='Logo_transparent_background.png'></a> ")
         wellPanel(
-          helpText("This app is a demonstration of confidence intervals. The length of the bars are the size of the intervals. If the interval does not overlap with the population value (the black vertical line) then it is colored red to indicate a type 1 error.")
+          helpText("This app is a demonstration of t-test confidence intervals. The length of the bars are the size of the intervals. If the interval does not overlap with the population value (the black vertical line) then it is colored red to indicate a type 1 error.")
           )
         ,wellPanel(
-          numericInput(inputId = "nsamp"
-                       ,label=strong("Sample Size")
-                       ,value=100
-                       ,min=5
-                       ,max=10000)
-          ,numericInput(inputId = "mean"
-                       ,label = strong("Mean")
-                       ,value = 0
-                       ,min=1
-                       ,max=10000000)
+
+          sliderInput('nsamp',
+                      'Sample Size per Trial',
+                      min = 10,
+                      max = 1000,
+                      value = 100,
+                      step = 1),
+
+          sliderInput('mean',
+                      'Mean',
+                      min = -2,
+                      max = 2,
+                      value = 0,
+                      step = 0.25),
+
+          sliderInput('variance',
+                      'Variance',
+                      min = 1,
+                      max = 25,
+                      value = 1,
+                      step = 1),
           
-          ,numericInput(inputId = "variance"
-                       ,label = strong("Variance")
-                       ,value = 1
-                       ,min=.01
-                       ,max=100)
+          sliderInput('skew',
+                      'Skew',
+                      min = -20,
+                      max = 20,
+                      value = 0,
+                      step = 5),          
           
-          ,numericInput(inputId = "conf.level"
+          
+          numericInput(inputId = "conf.level"
                        ,label=strong("Confidence Level")
                        ,value=95
                        ,min=1
@@ -50,8 +63,15 @@ shinyUI(fluidPage(
       # number of observations. Note the use of the h4 function to provide
       # an additional header above each output section.
       ,mainPanel(
-        plotOutput('conf.plot', width="90%", height="600px")
-      )
+        verbatimTextOutput("hitProp"),
+        div(class="span6", align="center", plotOutput("conf.plot", width = "90%", height = "600px", 
+                                                      
+                                                      br(),downloadButton('png2','Printer-friendly Version'))),
+  
+        div(class="span6", align="center", plotOutput("samp_dist", width = "90%", height = "500px", 
+                                                      
+                                                      br(),downloadButton('png2','Printer-friendly Version')))
+        )
     )
   )
 
