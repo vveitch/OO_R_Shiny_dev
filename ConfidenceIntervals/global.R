@@ -1,12 +1,12 @@
-interval_gen = function(n,pop.mean,pop.var,skew=0,conf.level){
+interval_gen = function(n,pop.mean,pop.var,skew=0,conf.level,num.trials){
   #skew normal parameters deduced from mean and variance
   #formulas from https://en.wikipedia.org/wiki/Skew_normal_distribution
   delta=skew/sqrt(1+skew^2);
   omega=sqrt(pop.var/(1-2*delta^2/pi))
   xi = pop.mean - omega*delta*sqrt(2/pi)  
   
-  intervals=vector("list",100);
-  for (i in 1:100){
+  intervals=vector("list",num.trials);
+  for (i in 1:num.trials){
     x<- rsn(n,xi=xi,omega=omega,alpha=skew,tau=0);
     intervals[[i]] <- (t.test(x,conf.level=conf.level))$conf.int;
   }
@@ -16,11 +16,11 @@ interval_gen = function(n,pop.mean,pop.var,skew=0,conf.level){
 hit_counter = function(pop.mean,intervals){
 #inputs:
   #pop.mean=population mean
-  #intervals = list of 100 interval objects from t.test$conf.inv#output: number of CI's that do not 
+  #intervals = list of num.trials interval objects from t.test$conf.inv#output: number of CI's that do not 
 #output:
   #number of CI's that do not contain the true population mean
 hits=0;
-for (i in 1:100){
+for (i in 1:length(intervals)){
   interval <- intervals[[i]]
   if(pop.mean>interval[1] & pop.mean<interval[2]){
     hits=hits+1;
@@ -37,13 +37,13 @@ gen2 = function(n,pop.mean,conf.lvl,intervals){
 #output:
   #CI plot
   plot(NULL
-       #changed app to have fixed xlimits
-       ,xlim = c(-3,3)
+       #fixed xlimits of app chosen to look good with hardcoded parameter range
+       ,xlim = c(-5,5)
        ,ylim = c(0,100)
        ,yaxt = 'n'
        ,xlab = (conf.lvl)
        ,ylab = (n)
-       #        ,main = "Confidence Intervals of 100 Samples"
+       ,main = "Confidence Intervals of 100 Simulated Trials"
   )
   
   abline(v = pop.mean, col = 'black')

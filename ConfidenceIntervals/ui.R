@@ -17,16 +17,13 @@ shinyUI(fluidPage(
     
     #    HTML("<a href='http://psychoanalytix.com'> <img src='Logo_transparent_background.png'></a> ")
         wellPanel(
-          helpText("This app is a demonstration of t-test confidence intervals. The length of the bars are the size of the intervals. If the interval does not overlap with the population value (the black vertical line) then it is colored red to indicate a type 1 error.")
-          )
-        ,wellPanel(
 
           sliderInput('nsamp',
                       'Sample Size per Trial',
                       min = 10,
-                      max = 1000,
+                      max = 200,
                       value = 100,
-                      step = 1),
+                      step = 5),
 
           sliderInput('mean',
                       'Mean',
@@ -38,14 +35,14 @@ shinyUI(fluidPage(
           sliderInput('variance',
                       'Variance',
                       min = 1,
-                      max = 25,
+                      max = 10,
                       value = 1,
                       step = 1),
           
           sliderInput('skew',
                       'Skew',
-                      min = -20,
-                      max = 20,
+                      min = -100,
+                      max = 100,
                       value = 0,
                       step = 5),          
           
@@ -54,8 +51,23 @@ shinyUI(fluidPage(
                        ,label=strong("Confidence Level")
                        ,value=95
                        ,min=1
-                       ,max=99)
-          ,align="center")
+                       ,max=99),
+          
+          sliderInput('numTrials',
+                      'Number of Trials',
+                      min = 100,
+                      max = 1000,
+                      value = 100,
+                      step = 25),
+          
+          actionButton('obsClick',
+                       'Simulate New Data Set')
+    
+          ,align="center"),
+
+        wellPanel(
+          helpText("This app is a demonstration of t-test confidence intervals. The length of the bars are the size of the intervals. If the interval does not overlap with the population value (the black vertical line) then it is colored red to indicate a type 1 error.")
+        )
         ,helpText("App adapted from", a(href="http://psychoanalytix.com", "PsychoAnalytix.com"))
         )
  

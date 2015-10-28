@@ -13,7 +13,8 @@ scheme_colour <- "#2fa4e7"
 shinyServer(function(input, output) {
 
   test_intervals<-reactive({
-    interval_gen(input$nsamp,input$mean,input$variance,input$skew,(input$conf.level/100))
+    input$obsClick
+    interval_gen(input$nsamp,input$mean,input$variance,input$skew,(input$conf.level/100),input$numTrials)
     })
   
   output$conf.plot<-renderPlot({   
@@ -24,7 +25,7 @@ shinyServer(function(input, output) {
   })
   
   output$samp_dist <- renderPlot({
-    samp_dist_plot<-ggplot(data.frame(x=c(-5, 5)), aes(x)) + 
+    samp_dist_plot<-ggplot(data.frame(x=c(-10, 10)), aes(x)) + 
       coord_cartesian(ylim = c(0, 0.5)) + 
       labs(title='Sampling Distribution Density') +
       theme(plot.title = element_text(size=20, face="bold", vjust=2),
@@ -50,7 +51,7 @@ shinyServer(function(input, output) {
 
     })
   
-  output$hitProp <- renderPrint(cat(paste("Proportion of CIs containing true mean: ",hit_counter(input$mean,test_intervals())/100)))
+  output$hitProp <- renderPrint(cat(paste("Proportion of CIs containing true mean: ",hit_counter(input$mean,test_intervals())/input$numTrials)))
   
 })
 
