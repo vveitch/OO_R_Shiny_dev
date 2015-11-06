@@ -400,15 +400,14 @@ shinyServer(function(input, output){
         
         upper <- input$pr_max+.5*ran
         
-        cutoff <- input$pr_x
+        cutoff <- max(input$pr_x,lower)
         
         gridShadedCurve(dunif(x, input$pr_min+10^-8, input$pr_max-10^-8), 
-                        
                         from=lower, to=upper, fromfill=input$pr_min, tofill=cutoff, 
                         
                         ylab="probability density", main="True Distribution")
         
-        grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ", cutoff))
+ #       grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ", cutoff))
         
       } 
       
@@ -418,7 +417,7 @@ shinyServer(function(input, output){
         
         names(x) <- 0:input$pr_size
         
-        cutoff <- input$pr_x
+        cutoff <- max(input$pr_x,lower)
         
         colour <- c(rep(scheme_colour,input$pr_x+1),rep("#ffffff",input$pr_size-input$pr_x))
         
@@ -432,7 +431,7 @@ shinyServer(function(input, output){
         
         upper <- input$pr_mu + 4*input$pr_sigma
         
-        cutoff <- input$pr_x
+        cutoff <- max(input$pr_x,lower)
         
         gridShadedCurve(dnorm(x, input$pr_mu, input$pr_sigma), 
                         
@@ -440,7 +439,7 @@ shinyServer(function(input, output){
                         
                         ylab="probability density", main="True Distribution")
         
-        grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ",  cutoff))
+#        grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ",  cutoff))
         
       } 
       
@@ -456,7 +455,7 @@ shinyServer(function(input, output){
         
         upper <- 4*sigma
         
-        cutoff <- input$pr_x
+        cutoff <- max(input$pr_x,lower)
         
         gridShadedCurve(dt(x, input$pr_df), 
                         
@@ -464,7 +463,7 @@ shinyServer(function(input, output){
                         
                         ylab="probability density", main="True Distribution")
         
-        grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ",cutoff))
+  #      grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ",cutoff))
         
       } 
       
@@ -499,7 +498,7 @@ shinyServer(function(input, output){
         
         names(x) <- lower:upper
         
-        cutoff <- input$pr_x
+        cutoff <- max(input$pr_x,lower)
         
         quant_index <- floor(input$pr_x-lower)
         colour <- c(rep(scheme_colour,quant_index+1),rep("#ffffff",upper-lower-quant_index))
@@ -516,7 +515,7 @@ shinyServer(function(input, output){
         
         upper <- 1/input$pr_rate + 5/input$pr_rate
         
-        cutoff <- input$pr_x
+        cutoff <- max(input$pr_x,lower)
         
         gridShadedCurve(dexp(x, input$pr_rate), 
                         
@@ -524,7 +523,7 @@ shinyServer(function(input, output){
                         
                         ylab="probability density", main="True Distribution")
         
-        grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ",  cutoff))
+   #     grid.text(x=unit(cutoff, "native"), y=-.075, paste("x = ",  cutoff))
         
       } 
       

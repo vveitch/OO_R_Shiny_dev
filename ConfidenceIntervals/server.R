@@ -27,7 +27,7 @@ shinyServer(function(input, output) {
   output$samp_dist <- renderPlot({
     samp_dist_plot<-ggplot(data.frame(x=c(-10, 10)), aes(x)) + 
       coord_cartesian(ylim = c(0, 0.5)) + 
-      labs(title='Sampling Distribution Density') +
+      labs(title='Distribution of Observations') +
       theme(plot.title = element_text(size=20, face="bold", vjust=2),
             axis.title.x=element_blank(),
             axis.title.y=element_blank()
