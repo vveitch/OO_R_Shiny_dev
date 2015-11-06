@@ -400,8 +400,8 @@ shinyServer(function(input, output){
         
         upper <- input$pr_max+.5*ran
         
-        cutoff <- max(input$pr_x,lower)
-        
+        cutoff <- max(input$pr_x,input$pr_min)
+
         gridShadedCurve(dunif(x, input$pr_min+10^-8, input$pr_max-10^-8), 
                         from=lower, to=upper, fromfill=input$pr_min, tofill=cutoff, 
                         
@@ -417,7 +417,7 @@ shinyServer(function(input, output){
         
         names(x) <- 0:input$pr_size
         
-        cutoff <- max(input$pr_x,lower)
+        cutoff <- input$pr_x
         
         colour <- c(rep(scheme_colour,input$pr_x+1),rep("#ffffff",input$pr_size-input$pr_x))
         
