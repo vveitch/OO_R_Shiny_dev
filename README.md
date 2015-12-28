@@ -9,3 +9,5 @@ http://sta220.utstat.utoronto.ca/modules/sampling-distributions/the-distribution
 http://sta220.utstat.utoronto.ca/modules/sampling-distributions/the-distribution-of-a-sample-mean-shape/
 http://sta220.utstat.utoronto.ca/modules/statistical-tests-ii/power-for-testing-a-proportion/
 http://sta220.utstat.utoronto.ca/probability-distribution-calculator/
+
+The information and materials included in this repository is released under a Creative Commons BY-NC 4.0 license unless clearly noted as subject to an alternative license.
